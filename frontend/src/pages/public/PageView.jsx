@@ -72,7 +72,7 @@ export default function PageView() {
     window.scrollTo(0, 0)
 
     api
-      .get(`/public/pages/${slug}`)
+      .get(`/public/pages/${slug}`, { lang: locale })
       .then((response) => setPage(response.data))
       .catch((problem) =>
         setError(

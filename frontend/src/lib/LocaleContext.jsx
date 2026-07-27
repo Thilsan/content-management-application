@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { setApiLocale } from './api'
 
 const STORAGE_KEY = 'cms.locale'
 
@@ -80,6 +79,14 @@ const LocaleContext = createContext(null)
 
 export function LocaleProvider({ children }) {
   const [locale, setLocale] = useState(() => {
+    // ?lang= wins, so a link can be shared in a particular language. Otherwise
+    // whatever the visitor last chose.
+    const fromUrl = new URLSearchParams(window.location.search).get('lang')
+
+    if (fromUrl && LOCALES[fromUrl]) {
+      return fromUrl
+    }
+
     const stored = localStorage.getItem(STORAGE_KEY)
 
     return stored && LOCALES[stored] ? stored : 'en'
@@ -90,7 +97,6 @@ export function LocaleProvider({ children }) {
   // The document itself has to flip, not just the components: `dir` is what
   // drives every logical CSS property and the browser's own text handling.
   useEffect(() => {
-    setApiLocale(locale)
     document.documentElement.lang = locale
     document.documentElement.dir = dir
     localStorage.setItem(STORAGE_KEY, locale)

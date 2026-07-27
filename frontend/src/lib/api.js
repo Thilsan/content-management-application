@@ -4,13 +4,6 @@ const TOKEN_KEY = 'cms.token'
 
 let onUnauthorized = () => {}
 
-let locale = 'en'
-
-/** Public reads follow whichever language the visitor picked. */
-export function setApiLocale(next) {
-  locale = next
-}
-
 export function setUnauthorizedHandler(handler) {
   onUnauthorized = handler
 }
@@ -42,10 +35,6 @@ export class ApiError extends Error {
 
 async function request(method, path, { body, params } = {}) {
   const url = new URL(`${BASE_URL}/api${path}`)
-
-  if (path.startsWith('/public') && locale !== 'en') {
-    url.searchParams.set('lang', locale)
-  }
 
   Object.entries(params ?? {}).forEach(([key, value]) => {
     if (value !== '' && value !== null && value !== undefined) {

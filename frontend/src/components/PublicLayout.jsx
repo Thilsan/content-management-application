@@ -240,7 +240,7 @@ export default function PublicLayout() {
 
   useEffect(() => {
     api
-      .get('/public/menu')
+      .get('/public/menu', { lang: locale })
       .then((response) => setMenu(response.data))
       .catch((problem) => setError(problem.message))
       .finally(() => setLoading(false))
