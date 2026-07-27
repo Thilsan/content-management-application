@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { api } from '../lib/api'
+import PageThumb from './PageThumb.jsx'
 
 const TAB =
   'flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[0.9rem] font-medium whitespace-nowrap transition-colors'
@@ -10,10 +11,10 @@ function branchPages(item) {
   return [...item.pages, ...item.children.flatMap(branchPages)]
 }
 
-function Chevron() {
+function Chevron({ open }) {
   return (
     <svg
-      className="size-3 text-muted"
+      className={`size-3 text-muted transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
       viewBox="0 0 12 12"
       fill="none"
       stroke="currentColor"
@@ -27,42 +28,54 @@ function Chevron() {
   )
 }
 
-/** The nested part of a dropdown: a child section and its pages. */
-function DropdownSection({ item, onNavigate, depth }) {
+function MenuLink({ page, onNavigate }) {
+  return (
+    <NavLink
+      to={`/pages/${page.slug}`}
+      role="menuitem"
+      data-menu-item
+      onClick={onNavigate}
+      className={({ isActive }) =>
+        isActive
+          ? 'menu-item bg-accent-wash font-medium text-accent-strong'
+          : 'menu-item text-ink-soft hover:bg-wash hover:text-ink'
+      }
+    >
+      <PageThumb page={page} className="size-6 flex-none text-[0.6rem]" />
+      <span className="truncate">{page.title}</span>
+    </NavLink>
+  )
+}
+
+/** A nested section inside the dropdown, with its own pages beneath it. */
+function MenuGroup({ item, onNavigate }) {
   return (
     <>
-      <p className="overline mt-3 mb-1 px-2 first:mt-0" style={{ paddingLeft: 8 + depth * 10 }}>
-        {item.title}
-      </p>
+      <p className="overline px-2 pt-3 pb-1">{item.title}</p>
 
       {item.pages.map((page) => (
-        <Link
-          key={page.id}
-          to={`/pages/${page.slug}`}
-          onClick={onNavigate}
-          style={{ paddingLeft: 8 + depth * 10 }}
-          className="block rounded-md py-1.5 pr-2 text-[0.88rem] text-ink-soft hover:bg-wash hover:text-ink"
-        >
-          {page.title}
-        </Link>
+        <MenuLink key={page.id} page={page} onNavigate={onNavigate} />
       ))}
 
       {item.children.map((child) => (
-        <DropdownSection key={child.id} item={child} onNavigate={onNavigate} depth={depth + 1} />
+        <MenuGroup key={child.id} item={child} onNavigate={onNavigate} />
       ))}
     </>
   )
 }
 
-function NavItem({ item, open, onToggle, onNavigate }) {
+function NavItem({ item, open, onOpen, onClose, onToggle }) {
   const pages = branchPages(item)
+  const buttonRef = useRef(null)
+  const panelRef = useRef(null)
 
-  // A section with a single page and nothing nested is just a link.
+  // A section holding a single page and nothing nested is just a link. Wrapping
+  // one item in a dropdown would be a click for no reason.
   if (pages.length === 1 && item.children.length === 0) {
     return (
       <NavLink
         to={`/pages/${pages[0].slug}`}
-        onClick={onNavigate}
+        onClick={onClose}
         className={({ isActive }) =>
           isActive
             ? `${TAB} bg-accent-wash text-accent-strong`
@@ -74,36 +87,86 @@ function NavItem({ item, open, onToggle, onNavigate }) {
     )
   }
 
+  function focusItem(index) {
+    const items = [...(panelRef.current?.querySelectorAll('[data-menu-item]') ?? [])]
+
+    if (items.length === 0) {
+      return
+    }
+
+    const wrapped = (index + items.length) % items.length
+    items[wrapped].focus()
+  }
+
+  function handleButtonKey(event) {
+    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onOpen()
+      // The panel mounts on the next paint, so wait before reaching into it.
+      requestAnimationFrame(() => focusItem(0))
+    }
+  }
+
+  function handlePanelKey(event) {
+    const items = [...(panelRef.current?.querySelectorAll('[data-menu-item]') ?? [])]
+    const current = items.indexOf(document.activeElement)
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault()
+        focusItem(current + 1)
+        break
+      case 'ArrowUp':
+        event.preventDefault()
+        focusItem(current - 1)
+        break
+      case 'Home':
+        event.preventDefault()
+        focusItem(0)
+        break
+      case 'End':
+        event.preventDefault()
+        focusItem(items.length - 1)
+        break
+      case 'Escape':
+        event.preventDefault()
+        onClose()
+        buttonRef.current?.focus()
+        break
+      case 'Tab':
+        onClose()
+        break
+      default:
+        break
+    }
+  }
+
   return (
     <div className="relative">
       <button
+        ref={buttonRef}
         type="button"
         className={`${TAB} border-0 bg-transparent shadow-none ${
           open ? 'bg-wash text-ink' : 'text-ink-soft hover:bg-wash hover:text-ink'
         }`}
         aria-expanded={open}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         onClick={onToggle}
+        onKeyDown={handleButtonKey}
       >
         {item.title}
-        <Chevron />
+        <span className="text-[0.72rem] font-normal text-muted">{pages.length}</span>
+        <Chevron open={open} />
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 z-30 mt-1 max-h-[70vh] w-60 overflow-y-auto rounded-card border border-line bg-surface p-2 shadow-lift">
+        <div ref={panelRef} role="menu" onKeyDown={handlePanelKey} className="menu-panel">
           {item.pages.map((page) => (
-            <Link
-              key={page.id}
-              to={`/pages/${page.slug}`}
-              onClick={onNavigate}
-              className="block rounded-md px-2 py-1.5 text-[0.88rem] text-ink-soft hover:bg-wash hover:text-ink"
-            >
-              {page.title}
-            </Link>
+            <MenuLink key={page.id} page={page} onNavigate={onClose} />
           ))}
 
           {item.children.map((child) => (
-            <DropdownSection key={child.id} item={child} onNavigate={onNavigate} depth={0} />
+            <MenuGroup key={child.id} item={child} onNavigate={onClose} />
           ))}
         </div>
       )}
@@ -169,8 +232,9 @@ export default function PublicLayout() {
                 key={item.id}
                 item={item}
                 open={openId === item.id}
+                onOpen={() => setOpenId(item.id)}
+                onClose={() => setOpenId(null)}
                 onToggle={() => setOpenId(openId === item.id ? null : item.id)}
-                onNavigate={() => setOpenId(null)}
               />
             ))}
           </nav>

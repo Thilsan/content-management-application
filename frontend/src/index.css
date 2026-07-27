@@ -157,7 +157,7 @@
   }
 
   .tag-dot::before {
-    @apply size-[5px] rounded-full bg-current opacity-75;
+    @apply size-1.25 rounded-full bg-current opacity-75;
     content: '';
   }
 
@@ -220,10 +220,40 @@
     @apply mt-0.5 block text-[0.79rem] text-muted;
   }
 
+  /* Dropdown ------------------------------------------------------------- */
+
+  .menu-panel {
+    @apply absolute top-full left-0 z-30 mt-1.5 max-h-[70vh] w-72 max-w-[calc(100vw-3rem)]
+      overflow-y-auto rounded-card border border-line bg-surface p-1.5 shadow-lift;
+    animation: menu-in 0.13s ease-out;
+  }
+
+  .menu-item {
+    @apply flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[0.88rem];
+  }
+
+  /* Respect a reduced motion preference rather than animating regardless. */
+  @media (prefers-reduced-motion: reduce) {
+    .menu-panel {
+      animation: none;
+    }
+  }
+
   /* Inline code ---------------------------------------------------------- */
 
   .code {
     @apply rounded border border-line bg-wash px-1 py-px font-mono text-[0.84em] text-ink-soft;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -249,7 +279,7 @@
    --------------------------------------------------------------------------- */
 
 .editor-shell .ck.ck-editor__main > .ck-editor__editable {
-  @apply min-h-[340px] rounded-b-field border-line-strong;
+  @apply min-h-85 rounded-b-field border-line-strong;
 }
 
 .editor-shell .ck.ck-editor__top .ck-toolbar {
