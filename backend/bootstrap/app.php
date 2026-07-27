@@ -13,7 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // There is no login page to redirect a guest to. Returning null here lets
+        // the exception handler answer with a 401 instead of trying to resolve a
+        // route named "login" that this application does not have.
+        $middleware->redirectGuestsTo(fn () => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Anything under /api answers with JSON even when the client forgets the
