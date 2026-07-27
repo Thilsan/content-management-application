@@ -52,60 +52,74 @@ export default function TrashPage() {
 
   return (
     <>
-      <h1>Trash</h1>
-      <p className="muted">
-        Deleted pages are kept here. Restoring one puts it back exactly as it was, cover image
-        included.
-      </p>
+      <div className="page-head">
+        <div>
+          <p className="overline">Content</p>
+          <h1>Trash</h1>
+          <p className="lede">
+            Deleted pages are kept here. Restoring one puts it back exactly as it was, cover image
+            included.
+          </p>
+        </div>
+      </div>
 
       {error && <p className="notice error">{error}</p>}
       {notice && <p className="notice success">{notice}</p>}
 
-      <div className="card">
+      <div className="card flush">
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="empty">Loading…</p>
         ) : pages.length === 0 ? (
-          <p className="muted">The trash is empty.</p>
+          <div className="empty">
+            <strong>The trash is empty</strong>
+            Deleted pages will show up here, ready to be restored.
+          </div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Menu</th>
-                <th>Deleted</th>
-                <th>Created by</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {pages.map((row) => (
-                <tr key={row.id}>
-                  <td>
-                    <strong>{row.title}</strong>
-                    <div className="muted">/{row.slug}</div>
-                  </td>
-                  <td>{row.menu?.title ?? '—'}</td>
-                  <td className="muted">
-                    {row.deleted_at ? new Date(row.deleted_at).toLocaleString() : '—'}
-                  </td>
-                  <td className="muted">{row.created_by?.name ?? '—'}</td>
-                  <td>
-                    <div className="actions">
-                      <button type="button" className="tiny" onClick={() => restore(row)}>
-                        Restore
-                      </button>
-                      <button type="button" className="tiny danger" onClick={() => destroy(row)}>
-                        Delete for good
-                      </button>
-                    </div>
-                  </td>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Menu</th>
+                  <th>Deleted</th>
+                  <th>Created by</th>
+                  <th className="end" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pages.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <strong>{row.title}</strong>
+                      <span className="sub">/{row.slug}</span>
+                    </td>
+                    <td>{row.menu?.title ?? '—'}</td>
+                    <td>
+                      {row.deleted_at ? new Date(row.deleted_at).toLocaleString() : '—'}
+                    </td>
+                    <td>{row.created_by?.name ?? '—'}</td>
+                    <td className="end">
+                      <div className="actions">
+                        <button type="button" className="tiny" onClick={() => restore(row)}>
+                          Restore
+                        </button>
+                        <button type="button" className="tiny danger" onClick={() => destroy(row)}>
+                          Delete for good
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
-        <Pagination meta={meta} onChange={setPage} />
+        {meta && meta.last_page > 1 && (
+          <div style={{ padding: '0 1.35rem 1.1rem' }}>
+            <Pagination meta={meta} onChange={setPage} />
+          </div>
+        )}
       </div>
     </>
   )

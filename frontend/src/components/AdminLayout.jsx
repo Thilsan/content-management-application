@@ -14,6 +14,15 @@ const SECTIONS = [
   { to: '/admin/privileges', label: 'Privileges', privilege: 'privileges.view' },
 ]
 
+function initials(name) {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join('')
+}
+
 export default function AdminLayout() {
   const { user, loading, signOut, can } = useAuth()
   const location = useLocation()
@@ -30,7 +39,8 @@ export default function AdminLayout() {
     <>
       <header className="topbar">
         <Link to="/admin/pages" className="brand">
-          CMS back office
+          <span className="mark">CM</span>
+          Back office
         </Link>
 
         <nav>
@@ -43,14 +53,21 @@ export default function AdminLayout() {
 
         <span className="spacer" />
 
-        <span className="muted">
-          {user.name}
-          {user.roles.length > 0 && ` · ${user.roles.map((role) => role.name).join(', ')}`}
+        <Link to="/" className="quiet-link">
+          View site
+        </Link>
+
+        <span className="who">
+          <span className="avatar">{initials(user.name)}</span>
+          <span className="lines">
+            <span className="name">{user.name}</span>
+            <span className="role">
+              {user.roles.map((role) => role.name).join(', ') || 'No role'}
+            </span>
+          </span>
         </span>
 
-        <Link to="/">View site</Link>
-
-        <button type="button" onClick={signOut}>
+        <button type="button" className="tiny" onClick={signOut}>
           Sign out
         </button>
       </header>

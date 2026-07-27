@@ -140,9 +140,15 @@ export default function PageFormPage() {
 
   return (
     <>
-      <div className="between">
-        <h1>{editing ? 'Edit page' : 'Add page'}</h1>
-        <Link to="/admin/pages">Back to pages</Link>
+      <div className="page-head">
+        <div>
+          <p className="overline">{editing ? 'Editing' : 'New'}</p>
+          <h1>{editing ? 'Edit page' : 'Add page'}</h1>
+        </div>
+
+        <Link to="/admin/pages" className="button">
+          Back to pages
+        </Link>
       </div>
 
       {message && <p className="notice error">{message}</p>}
@@ -230,7 +236,7 @@ export default function PageFormPage() {
                 value={form.published_at}
                 onChange={(event) => update('published_at', event.target.value)}
               />
-              <p className="muted">
+              <p className="field-hint">
                 Leave empty to go live as soon as it is published, or set a date in the future to
                 schedule it.
               </p>
@@ -265,13 +271,15 @@ export default function PageFormPage() {
               accept="image/jpeg,image/png,image/webp"
               onChange={(event) => setCover(event.target.files?.[0] ?? null)}
             />
-            <p className="muted">jpg, png or webp, up to 4 MB.</p>
+            <p className="field-hint">jpg, png or webp, up to 4 MB.</p>
             <FieldError errors={errors} name="cover_image" />
           </div>
 
           <div className="field">
             <label>Body</label>
-            <RichTextEditor value={form.body} onChange={(html) => update('body', html)} />
+            <div className="editor-shell">
+              <RichTextEditor value={form.body} onChange={(html) => update('body', html)} />
+            </div>
             <FieldError errors={errors} name="body" />
           </div>
 

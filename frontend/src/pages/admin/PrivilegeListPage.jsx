@@ -68,19 +68,22 @@ export default function PrivilegeListPage() {
 
   return (
     <>
-      <div className="between">
-        <h1>Privileges</h1>
+      <div className="page-head">
+        <div>
+          <p className="overline">Access</p>
+          <h1>Privileges</h1>
+          <p className="lede">
+            Each name here doubles as the check the API performs, so a new privilege becomes
+            enforceable the moment a role grants it. Names read as <code>group.action</code>.
+          </p>
+        </div>
+
         {can('privileges.create') && (
           <button type="button" className="primary" onClick={() => setForm({ ...BLANK })}>
             Add privilege
           </button>
         )}
       </div>
-
-      <p className="muted">
-        Each name here doubles as the check the API performs, so a new privilege becomes enforceable
-        the moment a role grants it. Names read as <code>group.action</code>.
-      </p>
 
       {error && <p className="notice error">{error}</p>}
       {notice && <p className="notice success">{notice}</p>}
@@ -141,17 +144,18 @@ export default function PrivilegeListPage() {
         </form>
       )}
 
-      <div className="card">
+      <div className="card flush">
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="empty">Loading…</p>
         ) : (
-          <table>
+          <div className="table-scroll">
+            <table>
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Label</th>
                 <th>Group</th>
-                <th />
+                <th className="end" />
               </tr>
             </thead>
             <tbody>
@@ -162,7 +166,7 @@ export default function PrivilegeListPage() {
                   </td>
                   <td>{privilege.label}</td>
                   <td className="muted">{privilege.group}</td>
-                  <td>
+                  <td className="end">
                     <div className="actions">
                       {can('privileges.update') && (
                         <button
@@ -194,7 +198,8 @@ export default function PrivilegeListPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </>

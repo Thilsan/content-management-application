@@ -66,8 +66,15 @@ export default function PageListPage() {
 
   return (
     <>
-      <div className="between">
-        <h1>Pages</h1>
+      <div className="page-head">
+        <div>
+          <p className="overline">Content</p>
+          <h1>Pages</h1>
+          <p className="lede">
+            Every page including drafts and anything scheduled for a later date.
+          </p>
+        </div>
+
         {can('pages.create') && (
           <Link to="/admin/pages/new" className="button primary">
             Add page
@@ -78,7 +85,7 @@ export default function PageListPage() {
       {error && <p className="notice error">{error}</p>}
       {notice && <p className="notice success">{notice}</p>}
 
-      <div className="card">
+      <div className="card" style={{ marginBottom: '1rem' }}>
         <div className="row">
           <div>
             <label htmlFor="search">Search by title</label>
@@ -132,63 +139,80 @@ export default function PageListPage() {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card flush">
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="empty">Loading…</p>
         ) : pages.length === 0 ? (
-          <p className="muted">No pages match those filters.</p>
+          <div className="empty">
+            <strong>No pages match those filters</strong>
+            Try clearing the search or choosing a different menu.
+          </div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Menu</th>
-                <th>Status</th>
-                <th>Publish date</th>
-                <th>Last edited by</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {pages.map((row) => (
-                <tr key={row.id}>
-                  <td>
-                    <strong>{row.title}</strong>
-                    <div className="muted">/{row.slug}</div>
-                  </td>
-                  <td>{row.menu?.title ?? '—'}</td>
-                  <td>
-                    <StatusTag page={row} />
-                  </td>
-                  <td className="muted">
-                    {row.published_at ? new Date(row.published_at).toLocaleString() : 'Immediate'}
-                  </td>
-                  <td className="muted">{row.updated_by?.name ?? '—'}</td>
-                  <td>
-                    <div className="actions">
-                      {can('pages.update') && (
-                        <Link to={`/admin/pages/${row.id}/edit`} className="button tiny">
-                          Edit
-                        </Link>
-                      )}
-                      {can('pages.delete') && (
-                        <button
-                          type="button"
-                          className="tiny danger"
-                          onClick={() => handleDelete(row)}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Menu</th>
+                  <th>Status</th>
+                  <th>Publish date</th>
+                  <th>Last edited by</th>
+                  <th className="end" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {pages.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <strong>{row.title}</strong>
+                      <span className="sub">/{row.slug}</span>
+                    </td>
+                    <td>{row.menu?.title ?? '—'}</td>
+                    <td>
+                      <StatusTag page={row} />
+                    </td>
+                    <td>
+                      {row.published_at ? (
+                        new Date(row.published_at).toLocaleDateString(undefined, {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      ) : (
+                        <span className="muted">Immediate</span>
+                      )}
+                    </td>
+                    <td>{row.updated_by?.name ?? '—'}</td>
+                    <td className="end">
+                      <div className="actions">
+                        {can('pages.update') && (
+                          <Link to={`/admin/pages/${row.id}/edit`} className="button tiny">
+                            Edit
+                          </Link>
+                        )}
+                        {can('pages.delete') && (
+                          <button
+                            type="button"
+                            className="tiny danger"
+                            onClick={() => handleDelete(row)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
-        <Pagination meta={meta} onChange={setPage} />
+        {meta && meta.last_page > 1 && (
+          <div style={{ padding: '0 1.35rem 1.1rem' }}>
+            <Pagination meta={meta} onChange={setPage} />
+          </div>
+        )}
       </div>
     </>
   )

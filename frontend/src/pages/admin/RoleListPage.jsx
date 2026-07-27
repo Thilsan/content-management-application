@@ -107,19 +107,22 @@ export default function RoleListPage() {
 
   return (
     <>
-      <div className="between">
-        <h1>Roles</h1>
+      <div className="page-head">
+        <div>
+          <p className="overline">Access</p>
+          <h1>Roles</h1>
+          <p className="lede">
+            A role is a bundle of privileges. The API checks the privilege, never the role name, so
+            what a role may do is entirely a matter of which boxes are ticked here.
+          </p>
+        </div>
+
         {can('roles.create') && (
           <button type="button" className="primary" onClick={() => setForm({ ...BLANK })}>
             Add role
           </button>
         )}
       </div>
-
-      <p className="muted">
-        A role is a bundle of privileges. The API checks the privilege, never the role name, so what
-        a role may do is entirely a matter of which boxes are ticked here.
-      </p>
 
       {error && <p className="notice error">{error}</p>}
       {notice && <p className="notice success">{notice}</p>}
@@ -154,29 +157,32 @@ export default function RoleListPage() {
           </div>
 
           <div className="field">
-            <label>Privileges</label>
-
             {grouped.length === 0 ? (
-              <p className="muted">No privileges to choose from.</p>
+              <p className="field-hint">No privileges to choose from.</p>
             ) : (
-              grouped.map(([group, items]) => (
-                <div key={group} style={{ marginBottom: '0.75rem' }}>
-                  <div className="muted" style={{ textTransform: 'capitalize' }}>
-                    {group}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+                  gap: '1rem',
+                }}
+              >
+                {grouped.map(([group, items]) => (
+                  <div key={group} className="check-group">
+                    <span className="overline">{group}</span>
+                    {items.map((privilege) => (
+                      <label key={privilege.id} className="checkbox">
+                        <input
+                          type="checkbox"
+                          checked={form.privileges.includes(privilege.id)}
+                          onChange={() => togglePrivilege(privilege.id)}
+                        />
+                        {privilege.label}
+                      </label>
+                    ))}
                   </div>
-                  {items.map((privilege) => (
-                    <label key={privilege.id} className="checkbox">
-                      <input
-                        type="checkbox"
-                        checked={form.privileges.includes(privilege.id)}
-                        onChange={() => togglePrivilege(privilege.id)}
-                      />
-                      {privilege.label}
-                      <code className="muted">{privilege.name}</code>
-                    </label>
-                  ))}
-                </div>
-              ))
+                ))}
+              </div>
             )}
 
             <FieldError errors={errors} name="privileges" />
@@ -193,37 +199,38 @@ export default function RoleListPage() {
         </form>
       )}
 
-      <div className="card">
+      <div className="card flush">
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="empty">Loading…</p>
         ) : (
-          <table>
+          <div className="table-scroll">
+            <table>
             <thead>
               <tr>
                 <th>Role</th>
                 <th>Users</th>
-                <th>Privileges</th>
-                <th />
+                <th>Grants</th>
+                <th className="end" />
               </tr>
             </thead>
             <tbody>
               {roles.map((role) => (
                 <tr key={role.id}>
-                  <td>
+                  <td style={{ minWidth: 180 }}>
                     <strong>{role.name}</strong>
-                    <div className="muted">{role.description}</div>
+                    <span className="sub">{role.description}</span>
                   </td>
                   <td className="muted">{role.users_count}</td>
                   <td>
                     <div className="actions">
                       {role.privileges.map((privilege) => (
-                        <span key={privilege.id} className="tag">
+                        <span key={privilege.id} className="tag code">
                           {privilege.name}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td>
+                  <td className="end">
                     <div className="actions">
                       {can('roles.update') && (
                         <button
@@ -251,7 +258,8 @@ export default function RoleListPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </div>
     </>

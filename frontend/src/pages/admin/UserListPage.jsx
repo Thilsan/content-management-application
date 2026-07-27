@@ -107,8 +107,16 @@ export default function UserListPage() {
 
   return (
     <>
-      <div className="between">
-        <h1>Users</h1>
+      <div className="page-head">
+        <div>
+          <p className="overline">Access</p>
+          <h1>Users</h1>
+          <p className="lede">
+            A user may hold several roles. What they can actually do is the union of the privileges
+            those roles grant.
+          </p>
+        </div>
+
         {can('users.create') && (
           <button type="button" className="primary" onClick={() => setForm({ ...BLANK })}>
             Add user
@@ -164,10 +172,10 @@ export default function UserListPage() {
             </div>
           </div>
 
-          <div className="field">
-            <label>Roles</label>
+          <div className="check-group">
+            <span className="overline">Roles</span>
             {roles.length === 0 ? (
-              <p className="muted">No roles to choose from.</p>
+              <p className="field-hint">No roles to choose from.</p>
             ) : (
               roles.map((role) => (
                 <label key={role.id} className="checkbox">
@@ -197,8 +205,8 @@ export default function UserListPage() {
         </form>
       )}
 
-      <div className="card">
-        <div className="field">
+      <div className="card" style={{ marginBottom: '1rem' }}>
+        <div className="field" style={{ marginBottom: 0, maxWidth: 280 }}>
           <label htmlFor="search">Search</label>
           <input
             id="search"
@@ -211,18 +219,26 @@ export default function UserListPage() {
             }}
           />
         </div>
+      </div>
 
+      <div className="card flush">
         {loading ? (
-          <p className="muted">Loading…</p>
+          <p className="empty">Loading…</p>
+        ) : users.length === 0 ? (
+          <div className="empty">
+            <strong>No users match that search</strong>
+            Try a different name or email.
+          </div>
         ) : (
-          <table>
+          <div className="table-scroll">
+            <table>
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Roles</th>
                 <th>Privileges</th>
-                <th />
+                <th className="end" />
               </tr>
             </thead>
             <tbody>
@@ -230,12 +246,28 @@ export default function UserListPage() {
                 <tr key={row.id}>
                   <td>
                     <strong>{row.name}</strong>
-                    {row.id === currentUser.id && <span className="tag"> you</span>}
+                    {row.id === currentUser.id && (
+                      <span className="tag plain" style={{ marginLeft: '0.4rem' }}>
+                        you
+                      </span>
+                    )}
                   </td>
-                  <td className="muted">{row.email}</td>
-                  <td>{row.roles.map((role) => role.name).join(', ') || '—'}</td>
-                  <td className="muted">{row.privileges.length}</td>
+                  <td>{row.email}</td>
                   <td>
+                    <div className="actions">
+                      {row.roles.length === 0 ? (
+                        <span className="muted">—</span>
+                      ) : (
+                        row.roles.map((role) => (
+                          <span key={role.id} className="tag plain">
+                            {role.name}
+                          </span>
+                        ))
+                      )}
+                    </div>
+                  </td>
+                  <td className="muted">{row.privileges.length}</td>
+                  <td className="end">
                     <div className="actions">
                       {can('users.update') && (
                         <button
@@ -264,10 +296,15 @@ export default function UserListPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
 
-        <Pagination meta={meta} onChange={setPage} />
+        {meta && meta.last_page > 1 && (
+          <div style={{ padding: '0 1.35rem 1.1rem' }}>
+            <Pagination meta={meta} onChange={setPage} />
+          </div>
+        )}
       </div>
     </>
   )

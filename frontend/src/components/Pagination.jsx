@@ -5,25 +5,29 @@ export default function Pagination({ meta, onChange }) {
 
   return (
     <div className="pagination">
-      <button
-        type="button"
-        disabled={meta.current_page <= 1}
-        onClick={() => onChange(meta.current_page - 1)}
-      >
-        Previous
-      </button>
-
-      <span className="muted">
+      <span>
         Page {meta.current_page} of {meta.last_page} &middot; {meta.total} in total
       </span>
 
-      <button
-        type="button"
-        disabled={meta.current_page >= meta.last_page}
-        onClick={() => onChange(meta.current_page + 1)}
-      >
-        Next
-      </button>
+      <span className="pair">
+        <button
+          type="button"
+          className="tiny"
+          disabled={meta.current_page <= 1}
+          onClick={() => onChange(meta.current_page - 1)}
+        >
+          Previous
+        </button>
+
+        <button
+          type="button"
+          className="tiny"
+          disabled={meta.current_page >= meta.last_page}
+          onClick={() => onChange(meta.current_page + 1)}
+        >
+          Next
+        </button>
+      </span>
     </div>
   )
 }

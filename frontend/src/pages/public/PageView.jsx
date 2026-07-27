@@ -18,7 +18,7 @@ export default function PageView() {
       .catch((problem) =>
         setError(
           problem.status === 404
-            ? 'That page is not available. It may be a draft, or its publish date may not have arrived.'
+            ? 'This page is not available. It may be a draft, or its publish date may not have arrived yet.'
             : problem.message,
         ),
       )
@@ -32,26 +32,43 @@ export default function PageView() {
   if (error) {
     return (
       <div className="card reading">
-        <h1>Not available</h1>
-        <p className="muted">{error}</p>
-        <Link to="/">Back to the index</Link>
+        <div className="empty">
+          <strong>Not available</strong>
+          {error}
+          <p style={{ marginTop: '1rem' }}>
+            <Link to="/">Back to the index</Link>
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <article className="card reading">
-      {page.cover_image_url && <img className="cover" src={page.cover_image_url} alt="" />}
-
-      {page.menu && <p className="muted">{page.menu.title}</p>}
+    <article className="article reading">
+      <p className="breadcrumb">
+        <Link to="/">Index</Link>
+        {page.menu && (
+          <>
+            <span className="sep">/</span>
+            {page.menu.title}
+          </>
+        )}
+      </p>
 
       <h1>{page.title}</h1>
 
       {page.published_at && (
-        <p className="muted">
-          Published {new Date(page.published_at).toLocaleDateString()}
+        <p className="byline">
+          Published{' '}
+          {new Date(page.published_at).toLocaleDateString(undefined, {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
         </p>
       )}
+
+      {page.cover_image_url && <img className="cover" src={page.cover_image_url} alt="" />}
 
       {/*
         The body is HTML written by an authenticated editor in CKEditor, so it is

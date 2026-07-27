@@ -37,48 +37,68 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="shell reading">
-      <div className="card">
-        <h1>Sign in</h1>
+    <div className="auth">
+      <div className="panel">
+        <div className="card">
+          <div className="mark">CM</div>
 
-        {message && <p className="notice error">{message}</p>}
+          <h1>Sign in</h1>
+          <p className="lede">Manage pages, the menu and who may touch them.</p>
 
-        <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="username"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-            <FieldError errors={errors} name="email" />
+          {message && (
+            <p className="notice error" style={{ marginTop: '1.25rem' }}>
+              {message}
+            </p>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ marginTop: '1.35rem' }}>
+            <div className="field">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="username"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+              <FieldError errors={errors} name="email" />
+            </div>
+
+            <div className="field">
+              <label htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+              <FieldError errors={errors} name="password" />
+            </div>
+
+            <button
+              type="submit"
+              className="primary"
+              disabled={busy}
+              style={{ width: '100%', justifyContent: 'center' }}
+            >
+              {busy ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+
+          <div className="hint">
+            <span className="overline">Seeded accounts</span>
+            <code>admin@cms.test</code> — full access
+            <br />
+            <code>moderator@cms.test</code> — pages only
+            <br />
+            Password for both: <code>password</code>
           </div>
-
-          <div className="field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-            />
-            <FieldError errors={errors} name="password" />
-          </div>
-
-          <button type="submit" className="primary" disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
-
-        <p className="muted" style={{ marginTop: '1.25rem' }}>
-          Seeded accounts: <code>admin@cms.test</code> and <code>moderator@cms.test</code>, both with
-          the password <code>password</code>.
-        </p>
+        </div>
       </div>
     </div>
   )

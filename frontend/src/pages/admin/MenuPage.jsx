@@ -117,13 +117,21 @@ export default function MenuPage() {
 
   return (
     <>
-      <div className="between">
-        <h1>Menu</h1>
+      <div className="page-head">
+        <div>
+          <p className="overline">Structure</p>
+          <h1>Menu</h1>
+          <p className="lede">
+            Drag a heading to move it, and use the arrows to nest it under the one above. Moving a
+            heading takes its children with it. The public site follows this order.
+          </p>
+        </div>
+
         {mayReorder && (
           <div className="actions">
             {dirty && (
               <button type="button" onClick={() => setRows(saved)} disabled={saving}>
-                Discard changes
+                Discard
               </button>
             )}
             <button type="button" className="primary" onClick={saveOrder} disabled={!dirty || saving}>
@@ -133,22 +141,19 @@ export default function MenuPage() {
         )}
       </div>
 
-      <p className="muted">
-        Drag a heading to move it, and use the arrows to nest it under the one above. Moving a
-        heading takes its children with it. The public site follows this order.
-      </p>
-
       {error && <p className="notice error">{error}</p>}
       {notice && !dirty && <p className="notice success">{notice}</p>}
       {dirty && <p className="notice">Unsaved order. Nothing changes for readers until you save.</p>}
 
-      <MenuTreeEditor
-        rows={rows}
-        onChange={setRows}
-        sortable={mayReorder}
-        onEdit={can('menus.update') ? (row) => setEditing({ ...row }) : null}
-        onDelete={can('menus.delete') ? deleteItem : null}
-      />
+      <div className="tree">
+        <MenuTreeEditor
+          rows={rows}
+          onChange={setRows}
+          sortable={mayReorder}
+          onEdit={can('menus.update') ? (row) => setEditing({ ...row }) : null}
+          onDelete={can('menus.delete') ? deleteItem : null}
+        />
+      </div>
 
       {editing && (
         <form className="card" onSubmit={saveItem}>

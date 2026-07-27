@@ -1,29 +1,25 @@
 import { useEffect, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { api } from '../lib/api'
 
-function MenuNav({ items }) {
+function MenuNav({ items, depth }) {
   if (items.length === 0) {
     return null
   }
 
   return (
-    <ul className="menu-tree">
+    <ul className={depth === 0 ? 'menu-tree' : 'branch'}>
       {items.map((item) => (
         <li key={item.id}>
           <span className="section">{item.title}</span>
 
-          {item.pages.length > 0 && (
-            <ul>
-              {item.pages.map((page) => (
-                <li key={page.id}>
-                  <Link to={`/pages/${page.slug}`}>{page.title}</Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          {item.pages.map((page) => (
+            <NavLink key={page.id} to={`/pages/${page.slug}`} className="leaf">
+              {page.title}
+            </NavLink>
+          ))}
 
-          <MenuNav items={item.children} />
+          <MenuNav items={item.children} depth={depth + 1} />
         </li>
       ))}
     </ul>
@@ -47,15 +43,20 @@ export default function PublicLayout() {
     <>
       <header className="topbar">
         <Link to="/" className="brand">
-          CMS
+          <span className="mark">CM</span>
+          Content
         </Link>
+
         <span className="spacer" />
-        <Link to="/admin">Back office</Link>
+
+        <Link to="/admin" className="quiet-link">
+          Back office
+        </Link>
       </header>
 
       <div className="shell columns">
         <aside>
-          <MenuNav items={menu} />
+          <MenuNav items={menu} depth={0} />
         </aside>
 
         <main>

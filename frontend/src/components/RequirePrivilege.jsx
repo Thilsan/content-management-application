@@ -10,10 +10,10 @@ export default function RequirePrivilege({ privilege, children }) {
   if (!can(privilege)) {
     return (
       <div className="card">
-        <h1>Not available</h1>
-        <p className="muted">
+        <div className="empty">
+          <strong>Not available</strong>
           This screen needs the <code>{privilege}</code> privilege, which none of your roles grant.
-        </p>
+        </div>
       </div>
     )
   }
