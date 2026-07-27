@@ -5,5 +5,5 @@ export default function FieldError({ errors, name }) {
     return null
   }
 
-  return <p className="field-error">{message}</p>
+  return <p className="error-text">{message}</p>
 }

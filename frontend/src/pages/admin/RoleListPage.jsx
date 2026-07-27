@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/AuthContext.jsx'
+import EmptyState from '../../components/EmptyState.jsx'
 import FieldError from '../../components/FieldError.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import { api } from '../../lib/api'
 
 const BLANK = { id: null, name: '', description: '', privileges: [] }
@@ -75,7 +77,9 @@ export default function RoleListPage() {
     try {
       if (form.id) {
         await api.put(`/roles/${form.id}`, payload)
-        setNotice(`${form.name} updated. Anyone holding it picks up the change on their next request.`)
+        setNotice(
+          `${form.name} updated. Anyone holding it picks up the change on their next request.`,
+        )
       } else {
         await api.post('/roles', payload)
         setNotice(`${form.name} added.`)
@@ -107,35 +111,33 @@ export default function RoleListPage() {
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">Access</p>
-          <h1>Roles</h1>
-          <p className="lede">
-            A role is a bundle of privileges. The API checks the privilege, never the role name, so
-            what a role may do is entirely a matter of which boxes are ticked here.
-          </p>
-        </div>
-
+      <PageHeader
+        overline="Access"
+        title="Roles"
+        lede="A role is a bundle of privileges. The API checks the privilege, never the role name, so what a role may do is entirely a matter of which boxes are ticked here."
+      >
         {can('roles.create') && (
-          <button type="button" className="primary" onClick={() => setForm({ ...BLANK })}>
+          <button type="button" className="btn btn-primary" onClick={() => setForm({ ...BLANK })}>
             Add role
           </button>
         )}
-      </div>
+      </PageHeader>
 
-      {error && <p className="notice error">{error}</p>}
-      {notice && <p className="notice success">{notice}</p>}
+      {error && <p className="notice notice-error">{error}</p>}
+      {notice && <p className="notice notice-success">{notice}</p>}
 
       {form && (
-        <form className="card" onSubmit={submit}>
-          <h2>{form.id ? 'Edit role' : 'Add role'}</h2>
+        <form className="card mb-4 p-5" onSubmit={submit}>
+          <h2 className="mb-4 text-[1.12rem]">{form.id ? 'Edit role' : 'Add role'}</h2>
 
-          <div className="row">
-            <div className="field">
-              <label htmlFor="name">Name</label>
+          <div className="mb-5 flex flex-wrap items-start gap-4">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="name">
+                Name
+              </label>
               <input
                 id="name"
+                className="input"
                 type="text"
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
@@ -144,10 +146,13 @@ export default function RoleListPage() {
               <FieldError errors={errors} name="name" />
             </div>
 
-            <div className="field">
-              <label htmlFor="description">Description</label>
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="description">
+                Description
+              </label>
               <input
                 id="description"
+                className="input"
                 type="text"
                 value={form.description ?? ''}
                 onChange={(event) => setForm({ ...form, description: event.target.value })}
@@ -156,20 +161,14 @@ export default function RoleListPage() {
             </div>
           </div>
 
-          <div className="field">
+          <div className="mb-5">
             {grouped.length === 0 ? (
-              <p className="field-hint">No privileges to choose from.</p>
+              <p className="hint">No privileges to choose from.</p>
             ) : (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-                  gap: '1rem',
-                }}
-              >
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {grouped.map(([group, items]) => (
-                  <div key={group} className="check-group">
-                    <span className="overline">{group}</span>
+                  <div key={group}>
+                    <span className="overline mb-2 block">{group}</span>
                     {items.map((privilege) => (
                       <label key={privilege.id} className="checkbox">
                         <input
@@ -188,76 +187,80 @@ export default function RoleListPage() {
             <FieldError errors={errors} name="privileges" />
           </div>
 
-          <div className="actions">
-            <button type="submit" className="primary">
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="submit" className="btn btn-primary">
               Save
             </button>
-            <button type="button" onClick={() => setForm(null)}>
+            <button type="button" className="btn" onClick={() => setForm(null)}>
               Cancel
             </button>
           </div>
         </form>
       )}
 
-      <div className="card flush">
+      <div className="card overflow-hidden">
         {loading ? (
-          <p className="empty">Loading…</p>
+          <EmptyState>Loading…</EmptyState>
         ) : (
-          <div className="table-scroll">
-            <table>
-            <thead>
-              <tr>
-                <th>Role</th>
-                <th>Users</th>
-                <th>Grants</th>
-                <th className="end" />
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map((role) => (
-                <tr key={role.id}>
-                  <td style={{ minWidth: 180 }}>
-                    <strong>{role.name}</strong>
-                    <span className="sub">{role.description}</span>
-                  </td>
-                  <td className="muted">{role.users_count}</td>
-                  <td>
-                    <div className="actions">
-                      {role.privileges.map((privilege) => (
-                        <span key={privilege.id} className="tag code">
-                          {privilege.name}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="end">
-                    <div className="actions">
-                      {can('roles.update') && (
-                        <button
-                          type="button"
-                          className="tiny"
-                          onClick={() =>
-                            setForm({
-                              id: role.id,
-                              name: role.name,
-                              description: role.description,
-                              privileges: role.privileges.map((privilege) => privilege.id),
-                            })
-                          }
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {can('roles.delete') && (
-                        <button type="button" className="tiny danger" onClick={() => destroy(role)}>
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Users</th>
+                  <th>Grants</th>
+                  <th className="text-right" />
                 </tr>
-              ))}
-            </tbody>
+              </thead>
+              <tbody>
+                {roles.map((role) => (
+                  <tr key={role.id}>
+                    <td className="min-w-45">
+                      <strong className="font-medium">{role.name}</strong>
+                      <span className="sub">{role.description}</span>
+                    </td>
+                    <td className="text-muted">{role.users_count}</td>
+                    <td>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {role.privileges.map((privilege) => (
+                          <span key={privilege.id} className="tag tag-code">
+                            {privilege.name}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="text-right">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {can('roles.update') && (
+                          <button
+                            type="button"
+                            className="btn btn-tiny"
+                            onClick={() =>
+                              setForm({
+                                id: role.id,
+                                name: role.name,
+                                description: role.description,
+                                privileges: role.privileges.map((privilege) => privilege.id),
+                              })
+                            }
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {can('roles.delete') && (
+                          <button
+                            type="button"
+                            className="btn btn-tiny btn-danger"
+                            onClick={() => destroy(role)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         )}

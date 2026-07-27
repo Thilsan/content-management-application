@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext.jsx'
+import EmptyState from '../../components/EmptyState.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import Pagination from '../../components/Pagination.jsx'
 import StatusTag from '../../components/StatusTag.jsx'
 import { api } from '../../lib/api'
@@ -66,31 +68,30 @@ export default function PageListPage() {
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">Content</p>
-          <h1>Pages</h1>
-          <p className="lede">
-            Every page including drafts and anything scheduled for a later date.
-          </p>
-        </div>
-
+      <PageHeader
+        overline="Content"
+        title="Pages"
+        lede="Every page including drafts and anything scheduled for a later date."
+      >
         {can('pages.create') && (
-          <Link to="/admin/pages/new" className="button primary">
+          <Link to="/admin/pages/new" className="btn btn-primary">
             Add page
           </Link>
         )}
-      </div>
+      </PageHeader>
 
-      {error && <p className="notice error">{error}</p>}
-      {notice && <p className="notice success">{notice}</p>}
+      {error && <p className="notice notice-error">{error}</p>}
+      {notice && <p className="notice notice-success">{notice}</p>}
 
-      <div className="card" style={{ marginBottom: '1rem' }}>
-        <div className="row">
-          <div>
-            <label htmlFor="search">Search by title</label>
+      <div className="card mb-4 p-5">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="min-w-45 flex-1">
+            <label className="label" htmlFor="search">
+              Search by title
+            </label>
             <input
               id="search"
+              className="input"
               type="search"
               value={search}
               placeholder="report"
@@ -101,10 +102,13 @@ export default function PageListPage() {
             />
           </div>
 
-          <div>
-            <label htmlFor="menu">Menu</label>
+          <div className="min-w-45 flex-1">
+            <label className="label" htmlFor="menu">
+              Menu
+            </label>
             <select
               id="menu"
+              className="input"
               value={menuId}
               onChange={(event) => {
                 setPage(1)
@@ -121,10 +125,13 @@ export default function PageListPage() {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="status">Status</label>
+          <div className="min-w-45 flex-1">
+            <label className="label" htmlFor="status">
+              Status
+            </label>
             <select
               id="status"
+              className="input"
               value={status}
               onChange={(event) => {
                 setPage(1)
@@ -139,17 +146,16 @@ export default function PageListPage() {
         </div>
       </div>
 
-      <div className="card flush">
+      <div className="card overflow-hidden">
         {loading ? (
-          <p className="empty">Loading…</p>
+          <EmptyState>Loading…</EmptyState>
         ) : pages.length === 0 ? (
-          <div className="empty">
-            <strong>No pages match those filters</strong>
+          <EmptyState title="No pages match those filters">
             Try clearing the search or choosing a different menu.
-          </div>
+          </EmptyState>
         ) : (
-          <div className="table-scroll">
-            <table>
+          <div className="overflow-x-auto">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Title</th>
@@ -157,14 +163,14 @@ export default function PageListPage() {
                   <th>Status</th>
                   <th>Publish date</th>
                   <th>Last edited by</th>
-                  <th className="end" />
+                  <th className="text-right" />
                 </tr>
               </thead>
               <tbody>
                 {pages.map((row) => (
                   <tr key={row.id}>
                     <td>
-                      <strong>{row.title}</strong>
+                      <strong className="font-medium">{row.title}</strong>
                       <span className="sub">/{row.slug}</span>
                     </td>
                     <td>{row.menu?.title ?? '—'}</td>
@@ -179,21 +185,21 @@ export default function PageListPage() {
                           year: 'numeric',
                         })
                       ) : (
-                        <span className="muted">Immediate</span>
+                        <span className="text-muted">Immediate</span>
                       )}
                     </td>
                     <td>{row.updated_by?.name ?? '—'}</td>
-                    <td className="end">
-                      <div className="actions">
+                    <td className="text-right">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
                         {can('pages.update') && (
-                          <Link to={`/admin/pages/${row.id}/edit`} className="button tiny">
+                          <Link to={`/admin/pages/${row.id}/edit`} className="btn btn-tiny">
                             Edit
                           </Link>
                         )}
                         {can('pages.delete') && (
                           <button
                             type="button"
-                            className="tiny danger"
+                            className="btn btn-tiny btn-danger"
                             onClick={() => handleDelete(row)}
                           >
                             Delete
@@ -209,7 +215,7 @@ export default function PageListPage() {
         )}
 
         {meta && meta.last_page > 1 && (
-          <div style={{ padding: '0 1.35rem 1.1rem' }}>
+          <div className="px-5 pb-4">
             <Pagination meta={meta} onChange={setPage} />
           </div>
         )}

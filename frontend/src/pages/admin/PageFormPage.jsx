@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import FieldError from '../../components/FieldError.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import RichTextEditor from '../../components/RichTextEditor.jsx'
 import { api } from '../../lib/api'
 import { flattenTree } from '../../lib/tree'
@@ -123,9 +124,7 @@ export default function PageFormPage() {
     try {
       const response = await api.postForm(editing ? `/pages/${id}` : '/pages', payload)
 
-      navigate('/admin/pages', {
-        state: { saved: response.data.title },
-      })
+      navigate('/admin/pages', { state: { saved: response.data.title } })
     } catch (problem) {
       setErrors(problem.errors ?? {})
       setMessage(problem.message)
@@ -135,30 +134,28 @@ export default function PageFormPage() {
   }
 
   if (loading) {
-    return <p className="muted">Loading…</p>
+    return <p className="text-[0.88rem] text-muted">Loading…</p>
   }
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">{editing ? 'Editing' : 'New'}</p>
-          <h1>{editing ? 'Edit page' : 'Add page'}</h1>
-        </div>
-
-        <Link to="/admin/pages" className="button">
+      <PageHeader overline={editing ? 'Editing' : 'New'} title={editing ? 'Edit page' : 'Add page'}>
+        <Link to="/admin/pages" className="btn">
           Back to pages
         </Link>
-      </div>
+      </PageHeader>
 
-      {message && <p className="notice error">{message}</p>}
+      {message && <p className="notice notice-error">{message}</p>}
 
       <form onSubmit={handleSubmit}>
-        <div className="card">
-          <div className="field">
-            <label htmlFor="title">Title</label>
+        <div className="card p-5">
+          <div className="mb-4">
+            <label className="label" htmlFor="title">
+              Title
+            </label>
             <input
               id="title"
+              className="input"
               type="text"
               value={form.title}
               onChange={(event) => update('title', event.target.value)}
@@ -167,11 +164,14 @@ export default function PageFormPage() {
             <FieldError errors={errors} name="title" />
           </div>
 
-          <div className="row">
-            <div className="field">
-              <label htmlFor="menu_id">Menu item</label>
+          <div className="mb-4 flex flex-wrap items-end gap-4">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="menu_id">
+                Menu item
+              </label>
               <select
                 id="menu_id"
+                className="input"
                 value={form.menu_id}
                 onChange={(event) => update('menu_id', event.target.value)}
                 required
@@ -187,12 +187,13 @@ export default function PageFormPage() {
               <FieldError errors={errors} name="menu_id" />
             </div>
 
-            <div className="field">
-              <label htmlFor="slug">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="slug">
                 Slug {editing ? '' : '(left to the server if blank)'}
               </label>
               <input
                 id="slug"
+                className="input"
                 type="text"
                 value={form.slug}
                 placeholder="who-we-are"
@@ -201,10 +202,13 @@ export default function PageFormPage() {
               <FieldError errors={errors} name="slug" />
             </div>
 
-            <div className="field shrink" style={{ maxWidth: 110 }}>
-              <label htmlFor="position">Order</label>
+            <div className="w-28">
+              <label className="label" htmlFor="position">
+                Order
+              </label>
               <input
                 id="position"
+                className="input"
                 type="number"
                 min="0"
                 value={form.position}
@@ -214,11 +218,14 @@ export default function PageFormPage() {
             </div>
           </div>
 
-          <div className="row">
-            <div className="field">
-              <label htmlFor="status">Status</label>
+          <div className="mb-4 flex flex-wrap items-start gap-4">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="status">
+                Status
+              </label>
               <select
                 id="status"
+                className="input"
                 value={form.status}
                 onChange={(event) => update('status', event.target.value)}
               >
@@ -228,15 +235,18 @@ export default function PageFormPage() {
               <FieldError errors={errors} name="status" />
             </div>
 
-            <div className="field">
-              <label htmlFor="published_at">Publish date</label>
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="published_at">
+                Publish date
+              </label>
               <input
                 id="published_at"
+                className="input"
                 type="datetime-local"
                 value={form.published_at}
                 onChange={(event) => update('published_at', event.target.value)}
               />
-              <p className="field-hint">
+              <p className="hint">
                 Leave empty to go live as soon as it is published, or set a date in the future to
                 schedule it.
               </p>
@@ -244,22 +254,32 @@ export default function PageFormPage() {
             </div>
           </div>
 
-          <div className="field">
-            <label htmlFor="cover">Cover image</label>
+          <div className="mb-4">
+            <label className="label" htmlFor="cover">
+              Cover image
+            </label>
 
             {existingCover && !removeCover && (
-              <div className="actions" style={{ marginBottom: '0.5rem' }}>
-                <img className="cover thumb" src={existingCover} alt="" />
-                <button type="button" className="tiny danger" onClick={() => setRemoveCover(true)}>
+              <div className="mb-2 flex items-center gap-2">
+                <img
+                  className="h-14 w-21 rounded-panel border border-line object-cover"
+                  src={existingCover}
+                  alt=""
+                />
+                <button
+                  type="button"
+                  className="btn btn-tiny btn-danger"
+                  onClick={() => setRemoveCover(true)}
+                >
                   Remove
                 </button>
               </div>
             )}
 
             {removeCover && (
-              <p className="muted">
-                The current image will be removed when you save.{' '}
-                <button type="button" className="tiny" onClick={() => setRemoveCover(false)}>
+              <p className="hint mb-2 flex items-center gap-2">
+                The current image will be removed when you save.
+                <button type="button" className="btn btn-tiny" onClick={() => setRemoveCover(false)}>
                   Keep it
                 </button>
               </p>
@@ -267,27 +287,28 @@ export default function PageFormPage() {
 
             <input
               id="cover"
+              className="input"
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={(event) => setCover(event.target.files?.[0] ?? null)}
             />
-            <p className="field-hint">jpg, png or webp, up to 4 MB.</p>
+            <p className="hint">jpg, png or webp, up to 4 MB.</p>
             <FieldError errors={errors} name="cover_image" />
           </div>
 
-          <div className="field">
-            <label>Body</label>
+          <div className="mb-5">
+            <span className="label">Body</span>
             <div className="editor-shell">
               <RichTextEditor value={form.body} onChange={(html) => update('body', html)} />
             </div>
             <FieldError errors={errors} name="body" />
           </div>
 
-          <div className="actions">
-            <button type="submit" className="primary" disabled={saving}>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? 'Saving…' : 'Save page'}
             </button>
-            <Link to="/admin/pages" className="button">
+            <Link to="/admin/pages" className="btn">
               Cancel
             </Link>
           </div>

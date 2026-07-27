@@ -37,25 +37,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="auth">
-      <div className="panel">
-        <div className="card">
-          <div className="mark">CM</div>
+    <div className="grid min-h-screen place-items-center p-6">
+      <div className="w-full max-w-96">
+        <div className="card p-6">
+          <div className="mb-4 grid size-8.5 place-items-center rounded-[10px] bg-linear-to-br from-accent to-[#6d4bf0] text-[0.9rem] font-bold text-white">
+            CM
+          </div>
 
-          <h1>Sign in</h1>
+          <h1 className="text-2xl">Sign in</h1>
           <p className="lede">Manage pages, the menu and who may touch them.</p>
 
-          {message && (
-            <p className="notice error" style={{ marginTop: '1.25rem' }}>
-              {message}
-            </p>
-          )}
+          {message && <p className="notice notice-error mt-5">{message}</p>}
 
-          <form onSubmit={handleSubmit} style={{ marginTop: '1.35rem' }}>
-            <div className="field">
-              <label htmlFor="email">Email</label>
+          <form onSubmit={handleSubmit} className="mt-5">
+            <div className="mb-4">
+              <label className="label" htmlFor="email">
+                Email
+              </label>
               <input
                 id="email"
+                className="input"
                 type="email"
                 autoComplete="username"
                 placeholder="you@example.com"
@@ -66,10 +67,13 @@ export default function LoginPage() {
               <FieldError errors={errors} name="email" />
             </div>
 
-            <div className="field">
-              <label htmlFor="password">Password</label>
+            <div className="mb-4">
+              <label className="label" htmlFor="password">
+                Password
+              </label>
               <input
                 id="password"
+                className="input"
                 type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
@@ -80,23 +84,18 @@ export default function LoginPage() {
               <FieldError errors={errors} name="password" />
             </div>
 
-            <button
-              type="submit"
-              className="primary"
-              disabled={busy}
-              style={{ width: '100%', justifyContent: 'center' }}
-            >
+            <button type="submit" className="btn btn-primary w-full justify-center" disabled={busy}>
               {busy ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
 
-          <div className="hint">
-            <span className="overline">Seeded accounts</span>
-            <code>admin@cms.test</code> — full access
+          <div className="mt-5 rounded-panel border border-line bg-wash px-3.5 py-3 text-[0.82rem] leading-7 text-ink-soft">
+            <span className="overline mb-1 block">Seeded accounts</span>
+            <code className="code">admin@cms.test</code> — full access
             <br />
-            <code>moderator@cms.test</code> — pages only
+            <code className="code">moderator@cms.test</code> — pages only
             <br />
-            Password for both: <code>password</code>
+            Password for both: <code className="code">password</code>
           </div>
         </div>
       </div>

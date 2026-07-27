@@ -1,4 +1,5 @@
 import { useAuth } from '../auth/AuthContext.jsx'
+import EmptyState from './EmptyState.jsx'
 
 /**
  * Hides a screen the signed in user has no privilege for. The API enforces the
@@ -10,10 +11,10 @@ export default function RequirePrivilege({ privilege, children }) {
   if (!can(privilege)) {
     return (
       <div className="card">
-        <div className="empty">
-          <strong>Not available</strong>
-          This screen needs the <code>{privilege}</code> privilege, which none of your roles grant.
-        </div>
+        <EmptyState title="Not available">
+          This screen needs the <code className="code">{privilege}</code> privilege, which none of
+          your roles grant.
+        </EmptyState>
       </div>
     )
   }

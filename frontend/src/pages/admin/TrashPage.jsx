@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
+import EmptyState from '../../components/EmptyState.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import Pagination from '../../components/Pagination.jsx'
 import { api } from '../../lib/api'
 
@@ -52,58 +54,54 @@ export default function TrashPage() {
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">Content</p>
-          <h1>Trash</h1>
-          <p className="lede">
-            Deleted pages are kept here. Restoring one puts it back exactly as it was, cover image
-            included.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        overline="Content"
+        title="Trash"
+        lede="Deleted pages are kept here. Restoring one puts it back exactly as it was, cover image included."
+      />
 
-      {error && <p className="notice error">{error}</p>}
-      {notice && <p className="notice success">{notice}</p>}
+      {error && <p className="notice notice-error">{error}</p>}
+      {notice && <p className="notice notice-success">{notice}</p>}
 
-      <div className="card flush">
+      <div className="card overflow-hidden">
         {loading ? (
-          <p className="empty">Loading…</p>
+          <EmptyState>Loading…</EmptyState>
         ) : pages.length === 0 ? (
-          <div className="empty">
-            <strong>The trash is empty</strong>
+          <EmptyState title="The trash is empty">
             Deleted pages will show up here, ready to be restored.
-          </div>
+          </EmptyState>
         ) : (
-          <div className="table-scroll">
-            <table>
+          <div className="overflow-x-auto">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>Title</th>
                   <th>Menu</th>
                   <th>Deleted</th>
                   <th>Created by</th>
-                  <th className="end" />
+                  <th className="text-right" />
                 </tr>
               </thead>
               <tbody>
                 {pages.map((row) => (
                   <tr key={row.id}>
                     <td>
-                      <strong>{row.title}</strong>
+                      <strong className="font-medium">{row.title}</strong>
                       <span className="sub">/{row.slug}</span>
                     </td>
                     <td>{row.menu?.title ?? '—'}</td>
-                    <td>
-                      {row.deleted_at ? new Date(row.deleted_at).toLocaleString() : '—'}
-                    </td>
+                    <td>{row.deleted_at ? new Date(row.deleted_at).toLocaleString() : '—'}</td>
                     <td>{row.created_by?.name ?? '—'}</td>
-                    <td className="end">
-                      <div className="actions">
-                        <button type="button" className="tiny" onClick={() => restore(row)}>
+                    <td className="text-right">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        <button type="button" className="btn btn-tiny" onClick={() => restore(row)}>
                           Restore
                         </button>
-                        <button type="button" className="tiny danger" onClick={() => destroy(row)}>
+                        <button
+                          type="button"
+                          className="btn btn-tiny btn-danger"
+                          onClick={() => destroy(row)}
+                        >
                           Delete for good
                         </button>
                       </div>
@@ -116,7 +114,7 @@ export default function TrashPage() {
         )}
 
         {meta && meta.last_page > 1 && (
-          <div style={{ padding: '0 1.35rem 1.1rem' }}>
+          <div className="px-5 pb-4">
             <Pagination meta={meta} onChange={setPage} />
           </div>
         )}

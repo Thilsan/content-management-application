@@ -5,12 +5,12 @@
  */
 export default function StatusTag({ page }) {
   if (page.status === 'draft') {
-    return <span className="tag draft">Draft</span>
+    return <span className="tag tag-dot tag-draft">Draft</span>
   }
 
   if (!page.is_visible) {
-    return <span className="tag scheduled">Scheduled</span>
+    return <span className="tag tag-dot tag-scheduled">Scheduled</span>
   }
 
-  return <span className="tag live">Live</span>
+  return <span className="tag tag-dot tag-live">Live</span>
 }

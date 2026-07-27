@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../auth/AuthContext.jsx'
+import EmptyState from '../../components/EmptyState.jsx'
 import FieldError from '../../components/FieldError.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import { api } from '../../lib/api'
 
 const BLANK = { id: null, name: '', label: '', group: '' }
@@ -68,35 +70,33 @@ export default function PrivilegeListPage() {
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">Access</p>
-          <h1>Privileges</h1>
-          <p className="lede">
-            Each name here doubles as the check the API performs, so a new privilege becomes
-            enforceable the moment a role grants it. Names read as <code>group.action</code>.
-          </p>
-        </div>
-
+      <PageHeader
+        overline="Access"
+        title="Privileges"
+        lede="Each name here doubles as the check the API performs, so a new privilege becomes enforceable the moment a role grants it. Names read as group.action."
+      >
         {can('privileges.create') && (
-          <button type="button" className="primary" onClick={() => setForm({ ...BLANK })}>
+          <button type="button" className="btn btn-primary" onClick={() => setForm({ ...BLANK })}>
             Add privilege
           </button>
         )}
-      </div>
+      </PageHeader>
 
-      {error && <p className="notice error">{error}</p>}
-      {notice && <p className="notice success">{notice}</p>}
+      {error && <p className="notice notice-error">{error}</p>}
+      {notice && <p className="notice notice-success">{notice}</p>}
 
       {form && (
-        <form className="card" onSubmit={submit}>
-          <h2>{form.id ? 'Edit privilege' : 'Add privilege'}</h2>
+        <form className="card mb-4 p-5" onSubmit={submit}>
+          <h2 className="mb-4 text-[1.12rem]">{form.id ? 'Edit privilege' : 'Add privilege'}</h2>
 
-          <div className="row">
-            <div className="field">
-              <label htmlFor="name">Name</label>
+          <div className="mb-4 flex flex-wrap items-start gap-4">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="name">
+                Name
+              </label>
               <input
                 id="name"
+                className="input"
                 type="text"
                 value={form.name}
                 placeholder="reports.export"
@@ -106,10 +106,13 @@ export default function PrivilegeListPage() {
               <FieldError errors={errors} name="name" />
             </div>
 
-            <div className="field">
-              <label htmlFor="label">Label</label>
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="label">
+                Label
+              </label>
               <input
                 id="label"
+                className="input"
                 type="text"
                 value={form.label}
                 placeholder="Export reports"
@@ -119,10 +122,13 @@ export default function PrivilegeListPage() {
               <FieldError errors={errors} name="label" />
             </div>
 
-            <div className="field">
-              <label htmlFor="group">Group</label>
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="group">
+                Group
+              </label>
               <input
                 id="group"
+                className="input"
                 type="text"
                 value={form.group}
                 placeholder="reports"
@@ -133,71 +139,71 @@ export default function PrivilegeListPage() {
             </div>
           </div>
 
-          <div className="actions">
-            <button type="submit" className="primary">
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="submit" className="btn btn-primary">
               Save
             </button>
-            <button type="button" onClick={() => setForm(null)}>
+            <button type="button" className="btn" onClick={() => setForm(null)}>
               Cancel
             </button>
           </div>
         </form>
       )}
 
-      <div className="card flush">
+      <div className="card overflow-hidden">
         {loading ? (
-          <p className="empty">Loading…</p>
+          <EmptyState>Loading…</EmptyState>
         ) : (
-          <div className="table-scroll">
-            <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Label</th>
-                <th>Group</th>
-                <th className="end" />
-              </tr>
-            </thead>
-            <tbody>
-              {privileges.map((privilege) => (
-                <tr key={privilege.id}>
-                  <td>
-                    <code>{privilege.name}</code>
-                  </td>
-                  <td>{privilege.label}</td>
-                  <td className="muted">{privilege.group}</td>
-                  <td className="end">
-                    <div className="actions">
-                      {can('privileges.update') && (
-                        <button
-                          type="button"
-                          className="tiny"
-                          onClick={() =>
-                            setForm({
-                              id: privilege.id,
-                              name: privilege.name,
-                              label: privilege.label,
-                              group: privilege.group,
-                            })
-                          }
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {can('privileges.delete') && (
-                        <button
-                          type="button"
-                          className="tiny danger"
-                          onClick={() => destroy(privilege)}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Label</th>
+                  <th>Group</th>
+                  <th className="text-right" />
                 </tr>
-              ))}
-            </tbody>
+              </thead>
+              <tbody>
+                {privileges.map((privilege) => (
+                  <tr key={privilege.id}>
+                    <td>
+                      <code className="code">{privilege.name}</code>
+                    </td>
+                    <td>{privilege.label}</td>
+                    <td className="text-muted">{privilege.group}</td>
+                    <td className="text-right">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {can('privileges.update') && (
+                          <button
+                            type="button"
+                            className="btn btn-tiny"
+                            onClick={() =>
+                              setForm({
+                                id: privilege.id,
+                                name: privilege.name,
+                                label: privilege.label,
+                                group: privilege.group,
+                              })
+                            }
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {can('privileges.delete') && (
+                          <button
+                            type="button"
+                            className="btn btn-tiny btn-danger"
+                            onClick={() => destroy(privilege)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         )}

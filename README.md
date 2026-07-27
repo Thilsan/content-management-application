@@ -5,7 +5,7 @@ sortable and nestable menu, and a React front end that reads it all. Every write
 guarded by a privilege that lives in the database, documented with OpenAPI and covered by tests.
 
 - **Back end** — PHP 8.2+, Laravel 12, MySQL, Laravel Sanctum, l5-swagger
-- **Front end** — React 19, Vite, React Router, CKEditor 5, dnd-kit
+- **Front end** — React 19, Vite, React Router, Tailwind CSS 4, CKEditor 5, dnd-kit
 - **Tests** — Pest, 75 feature and unit tests
 
 ```
@@ -36,6 +36,10 @@ the Swagger document. Watch it finish with `docker compose logs -f app`, then op
 | Back office | <http://localhost:5173/admin> |
 | API | <http://localhost:8000/api> |
 | Swagger UI | <http://localhost:8000/api/documentation> |
+
+The user interface is entirely the React app on port 5173. The Laravel side serves
+JSON and the Swagger page only, so <http://localhost:8000> redirects to the documentation
+rather than rendering anything of its own.
 
 Seeding runs once. To start over: `docker compose down -v && rm -f backend/storage/.seeded`.
 

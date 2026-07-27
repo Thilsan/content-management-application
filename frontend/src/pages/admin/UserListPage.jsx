@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../auth/AuthContext.jsx'
+import EmptyState from '../../components/EmptyState.jsx'
 import FieldError from '../../components/FieldError.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import Pagination from '../../components/Pagination.jsx'
 import { api } from '../../lib/api'
 
@@ -107,35 +109,33 @@ export default function UserListPage() {
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">Access</p>
-          <h1>Users</h1>
-          <p className="lede">
-            A user may hold several roles. What they can actually do is the union of the privileges
-            those roles grant.
-          </p>
-        </div>
-
+      <PageHeader
+        overline="Access"
+        title="Users"
+        lede="A user may hold several roles. What they can actually do is the union of the privileges those roles grant."
+      >
         {can('users.create') && (
-          <button type="button" className="primary" onClick={() => setForm({ ...BLANK })}>
+          <button type="button" className="btn btn-primary" onClick={() => setForm({ ...BLANK })}>
             Add user
           </button>
         )}
-      </div>
+      </PageHeader>
 
-      {error && <p className="notice error">{error}</p>}
-      {notice && <p className="notice success">{notice}</p>}
+      {error && <p className="notice notice-error">{error}</p>}
+      {notice && <p className="notice notice-success">{notice}</p>}
 
       {form && (
-        <form className="card" onSubmit={submit}>
-          <h2>{form.id ? 'Edit user' : 'Add user'}</h2>
+        <form className="card mb-4 p-5" onSubmit={submit}>
+          <h2 className="mb-4 text-[1.12rem]">{form.id ? 'Edit user' : 'Add user'}</h2>
 
-          <div className="row">
-            <div className="field">
-              <label htmlFor="name">Name</label>
+          <div className="mb-4 flex flex-wrap items-start gap-4">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="name">
+                Name
+              </label>
               <input
                 id="name"
+                className="input"
                 type="text"
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
@@ -144,10 +144,13 @@ export default function UserListPage() {
               <FieldError errors={errors} name="name" />
             </div>
 
-            <div className="field">
-              <label htmlFor="email">Email</label>
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="email">
+                Email
+              </label>
               <input
                 id="email"
+                className="input"
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm({ ...form, email: event.target.value })}
@@ -156,12 +159,14 @@ export default function UserListPage() {
               <FieldError errors={errors} name="email" />
             </div>
 
-            <div className="field">
-              <label htmlFor="password">
-                Password {form.id && <span className="muted">(blank keeps the current one)</span>}
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="password">
+                Password{' '}
+                {form.id && <span className="font-normal text-muted">(blank keeps the current one)</span>}
               </label>
               <input
                 id="password"
+                className="input"
                 type="password"
                 autoComplete="new-password"
                 value={form.password}
@@ -172,10 +177,10 @@ export default function UserListPage() {
             </div>
           </div>
 
-          <div className="check-group">
-            <span className="overline">Roles</span>
+          <div className="mb-4">
+            <span className="overline mb-2 block">Roles</span>
             {roles.length === 0 ? (
-              <p className="field-hint">No roles to choose from.</p>
+              <p className="hint">No roles to choose from.</p>
             ) : (
               roles.map((role) => (
                 <label key={role.id} className="checkbox">
@@ -185,8 +190,9 @@ export default function UserListPage() {
                     onChange={() => toggleRole(role.id)}
                   />
                   {role.name}
-                  <span className="muted">
-                    {role.privileges.length} {role.privileges.length === 1 ? 'privilege' : 'privileges'}
+                  <span className="text-[0.8rem] text-muted">
+                    {role.privileges.length}{' '}
+                    {role.privileges.length === 1 ? 'privilege' : 'privileges'}
                   </span>
                 </label>
               ))
@@ -194,22 +200,25 @@ export default function UserListPage() {
             <FieldError errors={errors} name="roles" />
           </div>
 
-          <div className="actions">
-            <button type="submit" className="primary">
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="submit" className="btn btn-primary">
               Save
             </button>
-            <button type="button" onClick={() => setForm(null)}>
+            <button type="button" className="btn" onClick={() => setForm(null)}>
               Cancel
             </button>
           </div>
         </form>
       )}
 
-      <div className="card" style={{ marginBottom: '1rem' }}>
-        <div className="field" style={{ marginBottom: 0, maxWidth: 280 }}>
-          <label htmlFor="search">Search</label>
+      <div className="card mb-4 p-5">
+        <div className="max-w-70">
+          <label className="label" htmlFor="search">
+            Search
+          </label>
           <input
             id="search"
+            className="input"
             type="search"
             value={search}
             placeholder="name or email"
@@ -221,87 +230,84 @@ export default function UserListPage() {
         </div>
       </div>
 
-      <div className="card flush">
+      <div className="card overflow-hidden">
         {loading ? (
-          <p className="empty">Loading…</p>
+          <EmptyState>Loading…</EmptyState>
         ) : users.length === 0 ? (
-          <div className="empty">
-            <strong>No users match that search</strong>
-            Try a different name or email.
-          </div>
+          <EmptyState title="No users match that search">Try a different name or email.</EmptyState>
         ) : (
-          <div className="table-scroll">
-            <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Roles</th>
-                <th>Privileges</th>
-                <th className="end" />
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((row) => (
-                <tr key={row.id}>
-                  <td>
-                    <strong>{row.name}</strong>
-                    {row.id === currentUser.id && (
-                      <span className="tag plain" style={{ marginLeft: '0.4rem' }}>
-                        you
-                      </span>
-                    )}
-                  </td>
-                  <td>{row.email}</td>
-                  <td>
-                    <div className="actions">
-                      {row.roles.length === 0 ? (
-                        <span className="muted">—</span>
-                      ) : (
-                        row.roles.map((role) => (
-                          <span key={role.id} className="tag plain">
-                            {role.name}
-                          </span>
-                        ))
-                      )}
-                    </div>
-                  </td>
-                  <td className="muted">{row.privileges.length}</td>
-                  <td className="end">
-                    <div className="actions">
-                      {can('users.update') && (
-                        <button
-                          type="button"
-                          className="tiny"
-                          onClick={() =>
-                            setForm({
-                              id: row.id,
-                              name: row.name,
-                              email: row.email,
-                              password: '',
-                              roles: row.roles.map((role) => role.id),
-                            })
-                          }
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {can('users.delete') && row.id !== currentUser.id && (
-                        <button type="button" className="tiny danger" onClick={() => destroy(row)}>
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Roles</th>
+                  <th>Privileges</th>
+                  <th className="text-right" />
                 </tr>
-              ))}
-            </tbody>
+              </thead>
+              <tbody>
+                {users.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <strong className="font-medium">{row.name}</strong>
+                      {row.id === currentUser.id && <span className="tag ml-1.5">you</span>}
+                    </td>
+                    <td>{row.email}</td>
+                    <td>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {row.roles.length === 0 ? (
+                          <span className="text-muted">—</span>
+                        ) : (
+                          row.roles.map((role) => (
+                            <span key={role.id} className="tag">
+                              {role.name}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    </td>
+                    <td className="text-muted">{row.privileges.length}</td>
+                    <td className="text-right">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {can('users.update') && (
+                          <button
+                            type="button"
+                            className="btn btn-tiny"
+                            onClick={() =>
+                              setForm({
+                                id: row.id,
+                                name: row.name,
+                                email: row.email,
+                                password: '',
+                                roles: row.roles.map((role) => role.id),
+                              })
+                            }
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {can('users.delete') && row.id !== currentUser.id && (
+                          <button
+                            type="button"
+                            className="btn btn-tiny btn-danger"
+                            onClick={() => destroy(row)}
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
         )}
 
         {meta && meta.last_page > 1 && (
-          <div style={{ padding: '0 1.35rem 1.1rem' }}>
+          <div className="px-5 pb-4">
             <Pagination meta={meta} onChange={setPage} />
           </div>
         )}

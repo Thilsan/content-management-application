@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../auth/AuthContext.jsx'
 import FieldError from '../../components/FieldError.jsx'
 import MenuTreeEditor from '../../components/MenuTreeEditor.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 import { api } from '../../lib/api'
 import { flattenTree, toReorderPayload } from '../../lib/tree'
 
@@ -112,40 +113,40 @@ export default function MenuPage() {
   }
 
   if (loading) {
-    return <p className="muted">Loading…</p>
+    return <p className="text-[0.88rem] text-muted">Loading…</p>
   }
 
   return (
     <>
-      <div className="page-head">
-        <div>
-          <p className="overline">Structure</p>
-          <h1>Menu</h1>
-          <p className="lede">
-            Drag a heading to move it, and use the arrows to nest it under the one above. Moving a
-            heading takes its children with it. The public site follows this order.
-          </p>
-        </div>
-
+      <PageHeader
+        overline="Structure"
+        title="Menu"
+        lede="Drag a heading to move it, and use the arrows to nest it under the one above. Moving a heading takes its children with it. The public site follows this order."
+      >
         {mayReorder && (
-          <div className="actions">
+          <>
             {dirty && (
-              <button type="button" onClick={() => setRows(saved)} disabled={saving}>
+              <button type="button" className="btn" onClick={() => setRows(saved)} disabled={saving}>
                 Discard
               </button>
             )}
-            <button type="button" className="primary" onClick={saveOrder} disabled={!dirty || saving}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={saveOrder}
+              disabled={!dirty || saving}
+            >
               {saving ? 'Saving…' : 'Save order'}
             </button>
-          </div>
+          </>
         )}
-      </div>
+      </PageHeader>
 
-      {error && <p className="notice error">{error}</p>}
-      {notice && !dirty && <p className="notice success">{notice}</p>}
+      {error && <p className="notice notice-error">{error}</p>}
+      {notice && !dirty && <p className="notice notice-success">{notice}</p>}
       {dirty && <p className="notice">Unsaved order. Nothing changes for readers until you save.</p>}
 
-      <div className="tree">
+      <div className="mb-4">
         <MenuTreeEditor
           rows={rows}
           onChange={setRows}
@@ -156,13 +157,18 @@ export default function MenuPage() {
       </div>
 
       {editing && (
-        <form className="card" onSubmit={saveItem}>
-          <h2>Edit “{saved.find((row) => row.id === editing.id)?.title}”</h2>
+        <form className="card mb-4 p-5" onSubmit={saveItem}>
+          <h2 className="mb-4 text-[1.12rem]">
+            Edit “{saved.find((row) => row.id === editing.id)?.title}”
+          </h2>
 
-          <div className="field">
-            <label htmlFor="edit-title">Title</label>
+          <div className="mb-4 max-w-md">
+            <label className="label" htmlFor="edit-title">
+              Title
+            </label>
             <input
               id="edit-title"
+              className="input"
               type="text"
               value={editing.title}
               onChange={(event) => setEditing({ ...editing, title: event.target.value })}
@@ -171,7 +177,7 @@ export default function MenuPage() {
             <FieldError errors={errors} name="title" />
           </div>
 
-          <div className="field">
+          <div className="mb-4">
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -180,16 +186,14 @@ export default function MenuPage() {
               />
               Visible on the public site
             </label>
-            <p className="muted">
-              Hiding a heading also hides everything nested beneath it.
-            </p>
+            <p className="hint">Hiding a heading also hides everything nested beneath it.</p>
           </div>
 
-          <div className="actions">
-            <button type="submit" className="primary">
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="submit" className="btn btn-primary">
               Save changes
             </button>
-            <button type="button" onClick={() => setEditing(null)}>
+            <button type="button" className="btn" onClick={() => setEditing(null)}>
               Cancel
             </button>
           </div>
@@ -197,14 +201,17 @@ export default function MenuPage() {
       )}
 
       {can('menus.create') && (
-        <form className="card" onSubmit={addItem}>
-          <h2>Add a heading</h2>
+        <form className="card p-5" onSubmit={addItem}>
+          <h2 className="mb-4 text-[1.12rem]">Add a heading</h2>
 
-          <div className="row">
-            <div className="field" style={{ marginBottom: 0 }}>
-              <label htmlFor="new-title">Title</label>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="new-title">
+                Title
+              </label>
               <input
                 id="new-title"
+                className="input"
                 type="text"
                 value={newTitle}
                 placeholder="Contact"
@@ -214,11 +221,9 @@ export default function MenuPage() {
               <FieldError errors={errors} name="title" />
             </div>
 
-            <div className="shrink">
-              <button type="submit" className="primary">
-                Add
-              </button>
-            </div>
+            <button type="submit" className="btn btn-primary">
+              Add
+            </button>
           </div>
         </form>
       )}

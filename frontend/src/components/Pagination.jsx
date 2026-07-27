@@ -4,15 +4,15 @@ export default function Pagination({ meta, onChange }) {
   }
 
   return (
-    <div className="pagination">
+    <div className="flex items-center justify-between gap-3 border-t border-line pt-4 text-[0.85rem] text-muted">
       <span>
         Page {meta.current_page} of {meta.last_page} &middot; {meta.total} in total
       </span>
 
-      <span className="pair">
+      <span className="flex gap-1.5">
         <button
           type="button"
-          className="tiny"
+          className="btn btn-tiny"
           disabled={meta.current_page <= 1}
           onClick={() => onChange(meta.current_page - 1)}
         >
@@ -21,7 +21,7 @@ export default function Pagination({ meta, onChange }) {
 
         <button
           type="button"
-          className="tiny"
+          className="btn btn-tiny"
           disabled={meta.current_page >= meta.last_page}
           onClick={() => onChange(meta.current_page + 1)}
         >

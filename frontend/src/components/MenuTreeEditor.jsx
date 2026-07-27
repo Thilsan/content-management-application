@@ -16,20 +16,12 @@ function Row({ row, sortable, onIndent, onOutdent, onEdit, onDelete }) {
     disabled: !sortable,
   })
 
-  const classes = ['tree-row']
-
-  if (isDragging) {
-    classes.push('dragging')
-  }
-
-  if (!row.isActive) {
-    classes.push('off')
-  }
-
   return (
     <div
       ref={setNodeRef}
-      className={classes.join(' ')}
+      className={`mb-1.5 flex items-center gap-2.5 rounded-panel border border-line bg-surface px-3 py-2 shadow-card ${
+        isDragging ? 'opacity-45 shadow-lift' : ''
+      }`}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -37,34 +29,59 @@ function Row({ row, sortable, onIndent, onOutdent, onEdit, onDelete }) {
       }}
     >
       {sortable && (
-        <span className="handle" title="Drag to reorder" {...attributes} {...listeners}>
+        <span
+          className="cursor-grab touch-none p-0.5 leading-none text-line-strong select-none hover:text-muted active:cursor-grabbing"
+          title="Drag to reorder"
+          {...attributes}
+          {...listeners}
+        >
           ⠿
         </span>
       )}
 
-      <span className="title">{row.title}</span>
+      <span
+        className={`min-w-0 flex-1 truncate text-[0.92rem] ${
+          row.isActive ? 'font-medium' : 'text-muted'
+        }`}
+      >
+        {row.title}
+      </span>
 
-      <span className="muted">
+      <span className="text-[0.78rem] whitespace-nowrap text-muted">
         {row.pagesCount} {row.pagesCount === 1 ? 'page' : 'pages'}
       </span>
 
       {!row.isActive && <span className="tag">Hidden</span>}
 
       {sortable && (
-        <span className="actions">
-          <button type="button" className="tiny" title="Outdent" onClick={() => onOutdent(row.id)}>
+        <span className="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            className="btn btn-tiny"
+            title="Outdent"
+            onClick={() => onOutdent(row.id)}
+          >
             &larr;
           </button>
-          <button type="button" className="tiny" title="Indent" onClick={() => onIndent(row.id)}>
+          <button
+            type="button"
+            className="btn btn-tiny"
+            title="Indent"
+            onClick={() => onIndent(row.id)}
+          >
             &rarr;
           </button>
           {onEdit && (
-            <button type="button" className="tiny" onClick={() => onEdit(row)}>
+            <button type="button" className="btn btn-tiny" onClick={() => onEdit(row)}>
               Edit
             </button>
           )}
           {onDelete && (
-            <button type="button" className="tiny danger" onClick={() => onDelete(row)}>
+            <button
+              type="button"
+              className="btn btn-tiny btn-danger"
+              onClick={() => onDelete(row)}
+            >
               Delete
             </button>
           )}

@@ -14,6 +14,8 @@ const SECTIONS = [
   { to: '/admin/privileges', label: 'Privileges', privilege: 'privileges.view' },
 ]
 
+const TAB = 'rounded-field px-2.5 py-1.5 text-[0.9rem] font-medium whitespace-nowrap'
+
 function initials(name) {
   return name
     .split(' ')
@@ -28,7 +30,7 @@ export default function AdminLayout() {
   const location = useLocation()
 
   if (loading) {
-    return <p className="shell muted">Loading…</p>
+    return <p className="mx-auto max-w-[1120px] px-6 pt-8 text-[0.88rem] text-muted">Loading…</p>
   }
 
   if (!user) {
@@ -37,42 +39,57 @@ export default function AdminLayout() {
 
   return (
     <>
-      <header className="topbar">
-        <Link to="/admin/pages" className="brand">
-          <span className="mark">CM</span>
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-5 border-b border-line bg-surface/85 px-6 backdrop-blur-md backdrop-saturate-150">
+        <Link
+          to="/admin/pages"
+          className="flex items-center gap-2 text-[0.95rem] font-semibold tracking-tight whitespace-nowrap text-ink hover:text-ink"
+        >
+          <span className="grid size-6 place-items-center rounded-[7px] bg-linear-to-br from-accent to-[#6d4bf0] text-[0.72rem] font-bold text-white">
+            CM
+          </span>
           Back office
         </Link>
 
-        <nav>
+        <nav className="flex gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SECTIONS.filter((section) => can(section.privilege)).map((section) => (
-            <NavLink key={section.to} to={section.to}>
+            <NavLink
+              key={section.to}
+              to={section.to}
+              className={({ isActive }) =>
+                isActive
+                  ? `${TAB} bg-accent-wash text-accent-strong`
+                  : `${TAB} text-ink-soft hover:bg-wash hover:text-ink`
+              }
+            >
               {section.label}
             </NavLink>
           ))}
         </nav>
 
-        <span className="spacer" />
+        <span className="ml-auto" />
 
-        <Link to="/" className="quiet-link">
+        <Link to="/" className="text-[0.88rem] font-medium text-ink-soft hover:text-ink">
           View site
         </Link>
 
-        <span className="who">
-          <span className="avatar">{initials(user.name)}</span>
-          <span className="lines">
-            <span className="name">{user.name}</span>
-            <span className="role">
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="grid size-6.5 flex-none place-items-center rounded-full border border-line-strong bg-wash text-[0.7rem] font-semibold text-ink-soft">
+            {initials(user.name)}
+          </span>
+          <span className="hidden min-w-0 leading-tight sm:block">
+            <span className="block truncate text-[0.85rem] font-medium">{user.name}</span>
+            <span className="block text-[0.72rem] whitespace-nowrap text-muted">
               {user.roles.map((role) => role.name).join(', ') || 'No role'}
             </span>
           </span>
         </span>
 
-        <button type="button" className="tiny" onClick={signOut}>
+        <button type="button" className="btn btn-tiny" onClick={signOut}>
           Sign out
         </button>
       </header>
 
-      <div className="shell">
+      <div className="mx-auto max-w-[1120px] px-6 pt-8 pb-16">
         <Outlet />
       </div>
     </>

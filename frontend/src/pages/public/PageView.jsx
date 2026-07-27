@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import EmptyState from '../../components/EmptyState.jsx'
 import { api } from '../../lib/api'
 
 export default function PageView() {
@@ -26,39 +27,40 @@ export default function PageView() {
   }, [slug])
 
   if (loading) {
-    return <p className="muted">Loading…</p>
+    return <p className="text-[0.88rem] text-muted">Loading…</p>
   }
 
   if (error) {
     return (
-      <div className="card reading">
-        <div className="empty">
-          <strong>Not available</strong>
+      <div className="card max-w-[720px]">
+        <EmptyState title="Not available">
           {error}
-          <p style={{ marginTop: '1rem' }}>
+          <p className="mt-4">
             <Link to="/">Back to the index</Link>
           </p>
-        </div>
+        </EmptyState>
       </div>
     )
   }
 
   return (
-    <article className="article reading">
-      <p className="breadcrumb">
-        <Link to="/">Index</Link>
+    <article className="max-w-[720px]">
+      <p className="mb-3 text-[0.8rem] text-muted">
+        <Link to="/" className="text-muted hover:text-ink">
+          Index
+        </Link>
         {page.menu && (
           <>
-            <span className="sep">/</span>
+            <span className="mx-1.5 text-line-strong">/</span>
             {page.menu.title}
           </>
         )}
       </p>
 
-      <h1>{page.title}</h1>
+      <h1 className="text-[2rem] tracking-[-0.025em]">{page.title}</h1>
 
       {page.published_at && (
-        <p className="byline">
+        <p className="mt-2.5 text-[0.83rem] text-muted">
           Published{' '}
           {new Date(page.published_at).toLocaleDateString(undefined, {
             day: 'numeric',
@@ -68,13 +70,19 @@ export default function PageView() {
         </p>
       )}
 
-      {page.cover_image_url && <img className="cover" src={page.cover_image_url} alt="" />}
+      {page.cover_image_url && (
+        <img
+          className="mt-6 max-h-85 w-full rounded-card border border-line object-cover"
+          src={page.cover_image_url}
+          alt=""
+        />
+      )}
 
       {/*
         The body is HTML written by an authenticated editor in CKEditor, so it is
         rendered as markup rather than escaped text.
       */}
-      <div className="page-body" dangerouslySetInnerHTML={{ __html: page.body }} />
+      <div className="page-body mt-6" dangerouslySetInnerHTML={{ __html: page.body }} />
     </article>
   )
 }
