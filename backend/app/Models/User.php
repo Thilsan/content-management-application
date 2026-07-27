@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +36,13 @@ class User extends Authenticatable
     ];
 
     /**
+     * Resolved once per request, since authorization checks it repeatedly.
+     *
+     * @var list<string>|null
+     */
+    protected ?array $privilegeNames = null;
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -45,5 +53,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * @return BelongsToMany<Role, $this>
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    /**
+     * Flattened privilege names granted by every role the user holds.
+     *
+     * @return list<string>
+     */
+    public function privilegeNames(): array
+    {
+        if ($this->privilegeNames === null) {
+            $this->loadMissing('roles.privileges');
+
+            $this->privilegeNames = $this->roles
+                ->pluck('privileges')
+                ->flatten()
+                ->pluck('name')
+                ->unique()
+                ->sort()
+                ->values()
+                ->all();
+        }
+
+        return $this->privilegeNames;
+    }
+
+    public function hasPrivilege(string $privilege): bool
+    {
+        return in_array($privilege, $this->privilegeNames(), true);
     }
 }
