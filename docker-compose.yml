@@ -17,6 +17,7 @@ services:
       retries: 30
 
   app:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/php/Dockerfile
@@ -40,6 +41,7 @@ services:
         condition: service_healthy
 
   nginx:
+    restart: unless-stopped
     image: nginx:1.27-alpine
     ports:
       - "${APP_PORT:-8000}:80"
@@ -52,6 +54,7 @@ services:
   # Runs pages:publish-due every minute, so a page with a future publish date
   # goes live on its own without anyone touching the site.
   scheduler:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: docker/php/Dockerfile
@@ -74,6 +77,7 @@ services:
         condition: service_healthy
 
   web:
+    restart: unless-stopped
     build:
       context: ./frontend
       target: dev

@@ -241,6 +241,9 @@ the trash. Deleting for good also removes the cover file from disk.
   flag rather than a side effect of submitting the form without a file.
 - **Deleting a menu item is refused while pages are filed under it**, including pages in the
   trash, rather than letting the foreign key fail.
+- **Composer resolves against PHP 8.2.** `config.platform.php` is pinned in `composer.json`, so
+  the lock file installs on any PHP the brief allows. Without it, resolving on a newer PHP pulls
+  in Symfony 8, which needs 8.4.1, and the project quietly stops matching its own requirement.
 - **CORS is limited to `FRONTEND_URL`** rather than left open.
 - **Login is rate limited** to six attempts a minute.
 - **Page bodies are rendered as HTML** on the public site. The markup comes from CKEditor and an
