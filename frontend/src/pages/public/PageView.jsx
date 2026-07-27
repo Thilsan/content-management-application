@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState.jsx'
+import PageThumb from '../../components/PageThumb.jsx'
 import { api } from '../../lib/api'
+import { readingMinutes } from '../../lib/cover'
 import { flattenPages, formatLongDate } from '../../lib/format'
+import useDocumentTitle from '../../lib/useDocumentTitle'
 
 export default function PageView() {
   const { slug } = useParams()
@@ -11,6 +14,8 @@ export default function PageView() {
   const [page, setPage] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  useDocumentTitle(page?.title)
 
   useEffect(() => {
     setLoading(true)
@@ -77,11 +82,11 @@ export default function PageView() {
 
         <h1 className="text-[2.15rem] leading-[1.15] tracking-[-0.03em]">{page.title}</h1>
 
-        {page.published_at && (
-          <p className="mt-3 text-[0.85rem] text-muted">
-            Published {formatLongDate(page.published_at)}
-          </p>
-        )}
+        <p className="mt-3 flex flex-wrap items-center gap-x-2 text-[0.85rem] text-muted">
+          {page.published_at && <span>Published {formatLongDate(page.published_at)}</span>}
+          {page.published_at && <span aria-hidden="true">·</span>}
+          <span>{readingMinutes(page.body)} min read</span>
+        </p>
 
         {page.cover_image_url && (
           <img
@@ -103,11 +108,14 @@ export default function PageView() {
           {previous ? (
             <Link
               to={`/pages/${previous.slug}`}
-              className="group rounded-card border border-line bg-surface p-4 shadow-card transition hover:border-accent/40 hover:shadow-lift"
+              className="group flex items-center gap-3 rounded-card border border-line bg-surface p-4 shadow-card transition hover:border-accent/40 hover:shadow-lift"
             >
-              <span className="overline">Previous</span>
-              <span className="mt-1 block text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
-                {previous.title}
+              <PageThumb page={previous} className="size-10 flex-none text-[0.95rem]" />
+              <span className="min-w-0">
+                <span className="overline">Previous</span>
+                <span className="mt-0.5 block truncate text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
+                  {previous.title}
+                </span>
               </span>
             </Link>
           ) : (
@@ -117,12 +125,15 @@ export default function PageView() {
           {next && (
             <Link
               to={`/pages/${next.slug}`}
-              className="group rounded-card border border-line bg-surface p-4 text-right shadow-card transition hover:border-accent/40 hover:shadow-lift"
+              className="group flex items-center justify-end gap-3 rounded-card border border-line bg-surface p-4 shadow-card transition hover:border-accent/40 hover:shadow-lift"
             >
-              <span className="overline">Next</span>
-              <span className="mt-1 block text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
-                {next.title}
+              <span className="min-w-0 text-right">
+                <span className="overline">Next</span>
+                <span className="mt-0.5 block truncate text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
+                  {next.title}
+                </span>
               </span>
+              <PageThumb page={next} className="size-10 flex-none text-[0.95rem]" />
             </Link>
           )}
         </nav>

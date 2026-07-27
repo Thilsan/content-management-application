@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState.jsx'
+import PageThumb from '../../components/PageThumb.jsx'
+import { isRecent } from '../../lib/cover'
 import { formatDate } from '../../lib/format'
 
 /** Flatten the tree into the sections that actually hold pages. */
@@ -20,11 +22,16 @@ function Row({ page }) {
   return (
     <Link
       to={`/pages/${page.slug}`}
-      className="group flex items-start gap-5 px-5 py-4 transition-colors hover:bg-[#fbfcfd]"
+      className="group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-[#fbfcfd]"
     >
+      <PageThumb page={page} className="size-11 flex-none text-[1.05rem]" />
+
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-4">
-          <h3 className="text-[1.02rem] text-ink group-hover:text-accent-strong">{page.title}</h3>
+          <h3 className="flex items-center gap-2 text-[1.02rem] text-ink group-hover:text-accent-strong">
+            {page.title}
+            {isRecent(page.published_at) && <span className="tag tag-scheduled">New</span>}
+          </h3>
           <span className="shrink-0 text-[0.78rem] whitespace-nowrap text-muted">
             {formatDate(page.published_at)}
           </span>
@@ -32,14 +39,6 @@ function Row({ page }) {
 
         <p className="mt-1 line-clamp-2 text-[0.89rem] text-ink-soft">{page.excerpt}</p>
       </div>
-
-      {page.cover_image_url && (
-        <img
-          className="hidden h-16 w-24 flex-none rounded-panel border border-line object-cover sm:block"
-          src={page.cover_image_url}
-          alt=""
-        />
-      )}
     </Link>
   )
 }
