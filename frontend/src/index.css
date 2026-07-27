@@ -138,9 +138,13 @@
   }
 
   select.input {
-    @apply appearance-none bg-no-repeat pr-8;
+    @apply appearance-none bg-no-repeat pe-8;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%238b95a2' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
     background-position: right 0.6rem center;
+  }
+
+  [dir='rtl'] select.input {
+    background-position: left 0.6rem center;
   }
 
   input[type='file'].input {
@@ -194,16 +198,16 @@
   /* Notices -------------------------------------------------------------- */
 
   .notice {
-    @apply mb-4 rounded-panel border border-line border-l-[3px] border-l-line-strong bg-surface
+    @apply mb-4 rounded-panel border border-line border-s-[3px] border-s-line-strong bg-surface
       px-3.5 py-2.5 text-[0.89rem] text-ink-soft;
   }
 
   .notice-error {
-    @apply border-[#eabdb8] border-l-danger bg-danger-wash text-danger;
+    @apply border-[#eabdb8] border-s-danger bg-danger-wash text-danger;
   }
 
   .notice-success {
-    @apply border-[#bfe0cc] border-l-ok bg-ok-wash text-ok;
+    @apply border-[#bfe0cc] border-s-ok bg-ok-wash text-ok;
   }
 
   /* Tables --------------------------------------------------------------- */
@@ -237,7 +241,7 @@
   /* Dropdown ------------------------------------------------------------- */
 
   .menu-panel {
-    @apply absolute top-full left-0 z-30 mt-1.5 max-h-[70vh] w-72 max-w-[calc(100vw-3rem)]
+    @apply absolute top-full start-0 z-30 mt-1.5 max-h-[70vh] w-72 max-w-[calc(100vw-3rem)]
       overflow-y-auto rounded-card border border-line bg-surface p-1.5 shadow-lift;
     animation: menu-in 0.13s ease-out;
   }
@@ -258,6 +262,35 @@
   .code {
     @apply rounded border border-line bg-wash px-1 py-px font-mono text-[0.84em] text-ink-soft;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Right to left. Layout flips on its own because the components use logical
+   properties; these are the places that cannot, either because the typography
+   plugin hard codes a side or because Arabic needs different glyphs.
+   --------------------------------------------------------------------------- */
+
+[dir='rtl'] body {
+  font-family: 'SF Arabic', 'Geeza Pro', 'Noto Sans Arabic', 'Segoe UI', ui-sans-serif,
+    system-ui, sans-serif;
+}
+
+[dir='rtl'] .page-body blockquote {
+  border-left-width: 0;
+  border-right-width: 2px;
+  border-right-color: var(--color-accent);
+  padding-left: 0;
+  padding-right: 1.1rem;
+}
+
+[dir='rtl'] .page-body :is(ul, ol) {
+  padding-left: 0;
+  padding-right: 1.3rem;
+}
+
+/* Arabic reads better with a touch more line height. */
+[dir='rtl'] .page-body :is(p, li) {
+  line-height: 1.9;
 }
 
 @keyframes menu-in {

@@ -9,6 +9,7 @@ export function flattenTree(nodes, depth = 0, rows = []) {
     rows.push({
       id: node.id,
       title: node.title,
+      titleAr: node.title_ar ?? '',
       slug: node.slug,
       isActive: node.is_active,
       pagesCount: node.pages_count ?? 0,

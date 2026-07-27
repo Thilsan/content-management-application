@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import {
   Autoformat,
@@ -66,11 +67,19 @@ const EDITOR_CONFIG = {
   },
 }
 
-export default function RichTextEditor({ value, onChange }) {
+export default function RichTextEditor({ value, onChange, contentLanguage = 'en' }) {
+  // Telling CKEditor the content language is what flips the editing area to
+  // right to left; styling it from outside would not move the caret.
+  const config = useMemo(
+    () => ({ ...EDITOR_CONFIG, language: { ui: 'en', content: contentLanguage } }),
+    [contentLanguage],
+  )
+
   return (
     <CKEditor
+      key={contentLanguage}
       editor={ClassicEditor}
-      config={EDITOR_CONFIG}
+      config={config}
       data={value ?? ''}
       onChange={(event, editor) => onChange(editor.getData())}
     />

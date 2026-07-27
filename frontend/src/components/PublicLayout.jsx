@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { api } from '../lib/api'
+import { LOCALES, useLocale } from '../lib/LocaleContext.jsx'
 import PageThumb from './PageThumb.jsx'
 
 const TAB =
@@ -203,12 +204,39 @@ function NavItem({ item, open, onOpen, onClose, onToggle }) {
   )
 }
 
+/** Two languages, so a segmented control beats a dropdown. */
+function LanguageSwitch() {
+  const { locale, setLocale } = useLocale()
+
+  return (
+    <div className="flex items-center gap-0.5 rounded-md border border-line p-0.5">
+      {Object.entries(LOCALES).map(([code, meta]) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => setLocale(code)}
+          aria-pressed={code === locale}
+          lang={code}
+          className={
+            code === locale
+              ? 'rounded px-2 py-0.5 text-[0.78rem] font-semibold bg-accent text-white shadow-none'
+              : 'rounded px-2 py-0.5 text-[0.78rem] font-medium text-ink-soft hover:bg-wash hover:text-ink'
+          }
+        >
+          {meta.short}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function PublicLayout() {
   const [menu, setMenu] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openId, setOpenId] = useState(null)
   const navRef = useRef(null)
+  const { t, locale } = useLocale()
 
   useEffect(() => {
     api
@@ -216,7 +244,7 @@ export default function PublicLayout() {
       .then((response) => setMenu(response.data))
       .catch((problem) => setError(problem.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [locale])
 
   // Close an open dropdown on a click elsewhere or on Escape.
   useEffect(() => {
@@ -268,12 +296,12 @@ export default function PublicLayout() {
             ))}
           </nav>
 
-          <Link
-            to="/admin"
-            className="ml-auto text-[0.88rem] font-medium text-ink-soft hover:text-ink"
-          >
-            Back office
-          </Link>
+          <div className="ms-auto flex items-center gap-3">
+            <LanguageSwitch />
+            <Link to="/admin" className="text-[0.88rem] font-medium text-ink-soft hover:text-ink">
+              {t.backOffice}
+            </Link>
+          </div>
         </div>
       </header>
 

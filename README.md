@@ -6,7 +6,7 @@ guarded by a privilege that lives in the database, documented with OpenAPI and c
 
 - **Back end** — PHP 8.2+, Laravel 12, MySQL, Laravel Sanctum, l5-swagger
 - **Front end** — React 19, Vite, React Router, Tailwind CSS 4, CKEditor 5, dnd-kit
-- **Tests** — Pest, 75 feature and unit tests
+- **Tests** — Pest, 95 feature and unit tests
 
 ```
 backend/     Laravel API
@@ -114,7 +114,7 @@ Tests run against SQLite in memory, so no database setup is needed and nothing t
 development data.
 
 ```
-Tests: 75 passed (242 assertions)
+Tests: 95 passed (308 assertions)
 ```
 
 What they cover:
@@ -127,6 +127,7 @@ What they cover:
 | `MenuTest` | Nested tree, reordering, circular-order rejection, deleting a branch that still holds pages |
 | `PublicContentTest` | Drafts and future dated pages hidden, a scheduled page appearing once promoted |
 | `ScheduledPublishingTest` | The Artisan command promoting, withdrawing, and leaving the audit trail alone |
+| `LocalisationTest` | Arabic content, the per page fallback, translated menus and Arabic search |
 | `UserManagementTest` | User CRUD, password hashing, and refusing to delete your own account |
 | `RoleManagementTest` | Role and privilege CRUD, and re-granting privileges changing what a role may do |
 | `HelperTest`, `SlugHelperTest` | The custom helpers |
@@ -249,6 +250,42 @@ the trash. Deleting for good also removes the cover file from disk.
 - **Page bodies are rendered as HTML** on the public site. The markup comes from CKEditor and an
   authenticated editor, which is the trust boundary a CMS accepts by design.
 
+## Arabic and right to left
+
+Pages and menu items carry an optional Arabic title and body next to the English ones. With two
+languages that is one row per page rather than a translations table, so nothing needs joining to
+render a page.
+
+Public endpoints take `?lang=ar`:
+
+```bash
+curl 'http://localhost:8000/api/public/pages/who-we-are?lang=ar'
+```
+
+The response is already resolved — one language, no field picking on the client:
+
+```json
+{ "title": "من نحن", "locale": "ar", "direction": "rtl", "is_translated": true }
+```
+
+**The fallback is per page, and all or nothing.** A page with no Arabic is served in English with
+`is_translated: false`, and the site says so rather than showing a blank title. A page translated
+only halfway is served wholly in English too — an Arabic heading above an English body is worse
+than either language on its own. Four of the eight seeded pages are translated, deliberately, so
+both paths are visible.
+
+On the site, the **EN / عربي** switch in the header sets `dir` and `lang` on the document and
+remembers the choice. Layout flips because the components use logical properties (`ms-`, `ps-`,
+`start-`, `text-end`, `border-s`) rather than left and right, so there is no mirrored stylesheet
+to maintain. The handful of places that cannot flip on their own — the typography plugin's
+blockquote border, list indents, the select arrow, and the Arabic font stack — are grouped under
+`[dir='rtl']` in `index.css`.
+
+Two details worth knowing. The article body carries its own `dir`, so an English fallback inside
+an otherwise Arabic page still reads left to right. And in the back office the page form has an
+**English / العربية** switch that puts CKEditor itself into RTL, because telling the editor its
+content language is what moves the caret; styling it from outside would not.
+
 ## Mobile client
 
 A small read-only Flutter app in `mobile/`. It signs in against the same Sanctum endpoints the
@@ -288,6 +325,10 @@ permit arbitrary HTTP.
 
 Of the three bonus items in the brief:
 
-- **Artisan command** — done. `pages:publish-due`, scheduled every minute, described above.
-- **Mobile app** — done. Flutter client in `mobile/`, described above.
-- **Arabic / RTL** — not built.
+All three are done:
+
+- **Artisan command** — `pages:publish-due`, scheduled every minute, described above.
+- **Mobile app** — Flutter client in `mobile/`, described above.
+- **Arabic / RTL** — bilingual pages with a per page fallback, described above.
+
+The mobile client stays English only; the brief asks for RTL on the public site.

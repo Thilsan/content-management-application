@@ -3,7 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom'
 import EmptyState from '../../components/EmptyState.jsx'
 import PageThumb from '../../components/PageThumb.jsx'
 import { isRecent } from '../../lib/cover'
-import { formatDate } from '../../lib/format'
+import { useDateFormatter, useLocale } from '../../lib/LocaleContext.jsx'
 
 /** Flatten the tree into the sections that actually hold pages. */
 function toSections(items) {
@@ -19,6 +19,8 @@ function toSections(items) {
  * whether the section has one page or twenty.
  */
 function Row({ page }) {
+  const formatDate = useDateFormatter()
+
   return (
     <Link
       to={`/pages/${page.slug}`}
@@ -45,6 +47,7 @@ function Row({ page }) {
 
 export default function HomePage() {
   const { menu, loading } = useOutletContext()
+  const { t } = useLocale()
   const [query, setQuery] = useState('')
 
   const sections = useMemo(() => toSections(menu), [menu])
@@ -77,15 +80,13 @@ export default function HomePage() {
   const found = results.reduce((count, section) => count + section.pages.length, 0)
 
   if (loading) {
-    return <p className="text-[0.88rem] text-muted">Loading…</p>
+    return <p className="text-[0.88rem] text-muted">{t.loading}</p>
   }
 
   if (total === 0) {
     return (
       <div className="card">
-        <EmptyState title="Nothing published yet">
-          Pages appear here once they are published and their publish date has passed.
-        </EmptyState>
+        <EmptyState title={t.nothingPublished}>{t.nothingPublishedDetail}</EmptyState>
       </div>
     )
   }
@@ -93,15 +94,14 @@ export default function HomePage() {
   return (
     <>
       <div className="mb-8 max-w-185">
-        <h1 className="text-[2.1rem] tracking-[-0.03em]">Published pages</h1>
+        <h1 className="text-[2.1rem] tracking-[-0.03em]">{t.publishedPages}</h1>
         <p className="lede text-[0.98rem]">
-          {total} {total === 1 ? 'page' : 'pages'} across {sections.length}{' '}
-          {sections.length === 1 ? 'section' : 'sections'}, in the order the menu sets.
+          {t.summary(total, sections.length, 'en')}
         </p>
 
         <div className="relative mt-5 max-w-md">
           <svg
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
+            className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-muted"
             viewBox="0 0 16 16"
             fill="none"
             stroke="currentColor"
@@ -114,8 +114,8 @@ export default function HomePage() {
 
           <input
             type="search"
-            className="input pl-9"
-            placeholder="Search these pages"
+            className="input ps-9"
+            placeholder={t.searchPages}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             aria-label="Search published pages"
@@ -124,19 +124,18 @@ export default function HomePage() {
 
         {query.trim() && (
           <p className="mt-2 text-[0.83rem] text-muted">
-            {found} {found === 1 ? 'match' : 'matches'} for “{query.trim()}”
+            {t.matches(found, query.trim())}
           </p>
         )}
       </div>
 
       {results.length === 0 ? (
         <div className="card">
-          <EmptyState title="No pages match that search">
-            Try a shorter word, or{' '}
+          <EmptyState title={t.noMatches}>
+            {t.tryShorter}{' '}
             <button type="button" className="text-accent underline" onClick={() => setQuery('')}>
-              clear the search
+              {t.clearSearch}
             </button>
-            .
           </EmptyState>
         </div>
       ) : (
@@ -146,7 +145,7 @@ export default function HomePage() {
               <div className="mb-2.5 flex items-baseline gap-3 px-1">
                 <h2 className="text-[1.05rem]">{section.title}</h2>
                 <span className="text-[0.78rem] text-muted">
-                  {section.pages.length} {section.pages.length === 1 ? 'page' : 'pages'}
+                  {section.pages.length} {section.pages.length === 1 ? t.page : t.pages}
                 </span>
               </div>
 

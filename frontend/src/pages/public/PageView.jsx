@@ -4,11 +4,13 @@ import EmptyState from '../../components/EmptyState.jsx'
 import PageThumb from '../../components/PageThumb.jsx'
 import { api } from '../../lib/api'
 import { coverStyle, readingMinutes } from '../../lib/cover'
-import { flattenPages, formatLongDate } from '../../lib/format'
+import { flattenPages } from '../../lib/format'
+import { useDateFormatter, useLocale } from '../../lib/LocaleContext.jsx'
 import { withHeadingIds } from '../../lib/toc'
 import useDocumentTitle from '../../lib/useDocumentTitle'
 
 function CopyLinkButton() {
+  const { t } = useLocale()
   const [copied, setCopied] = useState(false)
 
   async function copy() {
@@ -23,23 +25,25 @@ function CopyLinkButton() {
 
   return (
     <button type="button" className="btn btn-tiny" onClick={copy}>
-      {copied ? 'Link copied' : 'Copy link'}
+      {copied ? t.linkCopied : t.copyLink}
     </button>
   )
 }
 
 function Contents({ headings }) {
-  return (
-    <nav aria-label="On this page" className="lg:sticky lg:top-20">
-      <p className="eyebrow mb-2">On this page</p>
+  const { t } = useLocale()
 
-      <ul className="space-y-0.5 border-l border-line">
+  return (
+    <nav aria-label={t.onThisPage} className="lg:sticky lg:top-20">
+      <p className="eyebrow mb-2">{t.onThisPage}</p>
+
+      <ul className="space-y-0.5 border-s border-line">
         {headings.map((heading) => (
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
-              className="-ml-px block border-l-2 border-transparent py-1 text-[0.85rem] text-ink-soft hover:border-accent hover:text-ink"
-              style={{ paddingLeft: heading.level === 3 ? 22 : 12 }}
+              className="-ms-px block border-s-2 border-transparent py-1 text-[0.85rem] text-ink-soft hover:border-accent hover:text-ink"
+              style={{ paddingInlineStart: heading.level === 3 ? 22 : 12 }}
             >
               {heading.text}
             </a>
@@ -53,6 +57,8 @@ function Contents({ headings }) {
 export default function PageView() {
   const { slug } = useParams()
   const { menu } = useOutletContext()
+  const { t, locale } = useLocale()
+  const formatDate = useDateFormatter()
 
   const [page, setPage] = useState(null)
   const [error, setError] = useState(null)
@@ -71,12 +77,12 @@ export default function PageView() {
       .catch((problem) =>
         setError(
           problem.status === 404
-            ? 'This page is not available. It may be a draft, or its publish date may not have arrived yet.'
+            ? t.notAvailableDetail
             : problem.message,
         ),
       )
       .finally(() => setLoading(false))
-  }, [slug])
+  }, [slug, locale])
 
   const { html, headings } = useMemo(() => withHeadingIds(page?.body), [page?.body])
 
@@ -94,16 +100,16 @@ export default function PageView() {
   }, [menu, slug])
 
   if (loading) {
-    return <p className="text-[0.88rem] text-muted">Loading…</p>
+    return <p className="text-[0.88rem] text-muted">{t.loading}</p>
   }
 
   if (error) {
     return (
       <div className="card mx-auto max-w-185">
-        <EmptyState title="Not available">
+        <EmptyState title={t.notAvailable}>
           {error}
           <p className="mt-4">
-            <Link to="/">Back to the index</Link>
+            <Link to="/">{t.backToIndex}</Link>
           </p>
         </EmptyState>
       </div>
@@ -125,7 +131,7 @@ export default function PageView() {
         <article>
           <p className="mb-3 text-[0.8rem] text-muted">
             <Link to="/" className="text-muted hover:text-ink">
-              Index
+              {t.index}
             </Link>
             {page.menu && (
               <>
@@ -146,11 +152,24 @@ export default function PageView() {
 
           <h1 className="text-[2.15rem] leading-[1.15] tracking-[-0.03em]">{page.title}</h1>
 
+          {locale === 'ar' && page.is_translated === false && (
+            <p className="notice mt-4 mb-0" dir="rtl">
+              {t.onlyInEnglish}
+            </p>
+          )}
+
           <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-[0.85rem] text-muted">
-            {page.published_at && <span>Published {formatLongDate(page.published_at)}</span>}
+            {page.published_at && (
+              <span>
+                {t.published}{' '}
+                {formatDate(page.published_at, { day: 'numeric', month: 'long', year: 'numeric' })}
+              </span>
+            )}
             {page.published_at && <span aria-hidden="true">·</span>}
-            <span>{readingMinutes(page.body)} min read</span>
-            <span className="ml-auto">
+            <span>
+              {readingMinutes(page.body)} {t.minRead}
+            </span>
+            <span className="ms-auto">
               <CopyLinkButton />
             </span>
           </div>
@@ -167,7 +186,11 @@ export default function PageView() {
             The body is HTML written by an authenticated editor in CKEditor, so
             it is rendered as markup rather than escaped text.
           */}
-          <div className="page-body mt-7" dangerouslySetInnerHTML={{ __html: html }} />
+          <div
+            className="page-body mt-7"
+            dir={page.direction ?? 'ltr'}
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
         </article>
 
         {(previous || next) && (
@@ -179,7 +202,7 @@ export default function PageView() {
               >
                 <PageThumb page={previous} className="size-10 flex-none text-[0.95rem]" />
                 <span className="min-w-0">
-                  <span className="eyebrow">Previous</span>
+                  <span className="eyebrow">{t.previous}</span>
                   <span className="mt-0.5 block truncate text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
                     {previous.title}
                   </span>
@@ -194,8 +217,8 @@ export default function PageView() {
                 to={`/pages/${next.slug}`}
                 className="group flex items-center justify-end gap-3 rounded-card border border-line bg-surface p-4 shadow-card transition hover:border-accent/40 hover:shadow-lift"
               >
-                <span className="min-w-0 text-right">
-                  <span className="eyebrow">Next</span>
+                <span className="min-w-0 text-end">
+                  <span className="eyebrow">{t.next}</span>
                   <span className="mt-0.5 block truncate text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
                     {next.title}
                   </span>

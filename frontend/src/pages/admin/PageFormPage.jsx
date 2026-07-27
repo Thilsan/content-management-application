@@ -24,8 +24,10 @@ function toLocalInput(iso) {
 const BLANK = {
   menu_id: '',
   title: '',
+  title_ar: '',
   slug: '',
   body: '',
+  body_ar: '',
   status: 'draft',
   published_at: '',
   position: 0,
@@ -37,6 +39,7 @@ export default function PageFormPage() {
   const editing = Boolean(id)
 
   const [form, setForm] = useState(BLANK)
+  const [lang, setLang] = useState('en')
   const [menus, setMenus] = useState([])
   const [cover, setCover] = useState(null)
   const [existingCover, setExistingCover] = useState(null)
@@ -66,8 +69,10 @@ export default function PageFormPage() {
         setForm({
           menu_id: page.menu_id,
           title: page.title,
+          title_ar: page.title_ar ?? '',
           slug: page.slug,
           body: page.body,
+          body_ar: page.body_ar ?? '',
           status: page.status,
           published_at: toLocalInput(page.published_at),
           position: page.position,
@@ -95,6 +100,9 @@ export default function PageFormPage() {
     payload.append('menu_id', form.menu_id)
     payload.append('title', form.title)
     payload.append('body', form.body)
+    // Empty strings arrive as null, which is how a translation gets cleared.
+    payload.append('title_ar', form.title_ar ?? '')
+    payload.append('body_ar', form.body_ar ?? '')
     payload.append('status', form.status)
     payload.append('position', form.position ?? 0)
 
@@ -149,19 +157,53 @@ export default function PageFormPage() {
 
       <form onSubmit={handleSubmit}>
         <div className="card p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <span className="eyebrow">Content language</span>
+            <div className="flex items-center gap-0.5 rounded-md border border-line p-0.5">
+              {[
+                { code: 'en', label: 'English' },
+                { code: 'ar', label: 'العربية' },
+              ].map((option) => (
+                <button
+                  key={option.code}
+                  type="button"
+                  onClick={() => setLang(option.code)}
+                  aria-pressed={lang === option.code}
+                  className={
+                    lang === option.code
+                      ? 'rounded px-2.5 py-1 text-[0.82rem] font-semibold bg-accent text-white'
+                      : 'rounded px-2.5 py-1 text-[0.82rem] font-medium text-ink-soft hover:bg-wash hover:text-ink'
+                  }
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {lang === 'ar' && (
+            <p className="notice mb-4">
+              Arabic is optional. Anything left blank falls back to the English version on the
+              public site.
+            </p>
+          )}
+
           <div className="mb-4">
             <label className="label" htmlFor="title">
-              Title
+              {lang === 'en' ? 'Title' : 'Title in Arabic'}
             </label>
             <input
               id="title"
               className="input"
               type="text"
-              value={form.title}
-              onChange={(event) => update('title', event.target.value)}
-              required
+              dir={lang === 'ar' ? 'rtl' : 'ltr'}
+              value={lang === 'en' ? form.title : form.title_ar}
+              onChange={(event) =>
+                update(lang === 'en' ? 'title' : 'title_ar', event.target.value)
+              }
+              required={lang === 'en'}
             />
-            <FieldError errors={errors} name="title" />
+            <FieldError errors={errors} name={lang === 'en' ? 'title' : 'title_ar'} />
           </div>
 
           <div className="mb-4 flex flex-wrap items-end gap-4">
@@ -297,11 +339,15 @@ export default function PageFormPage() {
           </div>
 
           <div className="mb-5">
-            <span className="label">Body</span>
+            <span className="label">{lang === 'en' ? 'Body' : 'Body in Arabic'}</span>
             <div className="editor-shell">
-              <RichTextEditor value={form.body} onChange={(html) => update('body', html)} />
+              <RichTextEditor
+                contentLanguage={lang}
+                value={lang === 'en' ? form.body : form.body_ar}
+                onChange={(html) => update(lang === 'en' ? 'body' : 'body_ar', html)}
+              />
             </div>
-            <FieldError errors={errors} name="body" />
+            <FieldError errors={errors} name={lang === 'en' ? 'body' : 'body_ar'} />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

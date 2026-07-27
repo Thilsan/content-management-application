@@ -83,6 +83,7 @@ export default function MenuPage() {
     try {
       await api.put(`/menus/${editing.id}`, {
         title: editing.title,
+        title_ar: editing.titleAr ?? '',
         is_active: editing.isActive,
       })
 
@@ -162,19 +163,36 @@ export default function MenuPage() {
             Edit “{saved.find((row) => row.id === editing.id)?.title}”
           </h2>
 
-          <div className="mb-4 max-w-md">
-            <label className="label" htmlFor="edit-title">
-              Title
-            </label>
-            <input
-              id="edit-title"
-              className="input"
-              type="text"
-              value={editing.title}
-              onChange={(event) => setEditing({ ...editing, title: event.target.value })}
-              required
-            />
-            <FieldError errors={errors} name="title" />
+          <div className="mb-4 flex flex-wrap gap-4">
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="edit-title">
+                Title
+              </label>
+              <input
+                id="edit-title"
+                className="input"
+                type="text"
+                value={editing.title}
+                onChange={(event) => setEditing({ ...editing, title: event.target.value })}
+                required
+              />
+              <FieldError errors={errors} name="title" />
+            </div>
+
+            <div className="min-w-45 flex-1">
+              <label className="label" htmlFor="edit-title-ar">
+                Title in Arabic <span className="font-normal text-muted">(optional)</span>
+              </label>
+              <input
+                id="edit-title-ar"
+                className="input"
+                type="text"
+                dir="rtl"
+                value={editing.titleAr ?? ''}
+                onChange={(event) => setEditing({ ...editing, titleAr: event.target.value })}
+              />
+              <FieldError errors={errors} name="title_ar" />
+            </div>
           </div>
 
           <div className="mb-4">
