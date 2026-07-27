@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use OpenApi\Attributes as OA;
 
 class PublicContentController extends Controller
 {
@@ -22,6 +23,28 @@ class PublicContentController extends Controller
      * everything nested beneath it: its children no longer have a parent to be
      * attached to while the tree is assembled.
      */
+    #[OA\Get(
+        path: '/api/public/menu',
+        summary: 'The public menu tree with its pages',
+        description: 'No token required. Inactive menu items are left out, along with everything '.
+            'nested under them. Each item carries only the pages that are published and due.',
+        tags: ['Public'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'The tree',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(ref: '#/components/schemas/Menu'),
+                        ),
+                    ],
+                ),
+            ),
+        ],
+    )]
     public function menu(): AnonymousResourceCollection
     {
         $tree = Menu::tree(
@@ -37,6 +60,48 @@ class PublicContentController extends Controller
         return MenuResource::collection($tree);
     }
 
+    #[OA\Get(
+        path: '/api/public/pages',
+        summary: 'List the pages the public may read',
+        description: 'Drafts, pages dated in the future and pages under an inactive menu item are '.
+            'all excluded. Bodies are omitted from the listing.',
+        tags: ['Public'],
+        parameters: [
+            new OA\Parameter(
+                name: 'menu',
+                description: 'Slug of a menu item to filter by.',
+                in: 'query',
+                schema: new OA\Schema(type: 'string', example: 'news'),
+            ),
+            new OA\Parameter(
+                name: 'search',
+                in: 'query',
+                schema: new OA\Schema(type: 'string'),
+            ),
+            new OA\Parameter(
+                name: 'per_page',
+                in: 'query',
+                schema: new OA\Schema(type: 'integer', maximum: 100, minimum: 1, default: 12),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'A page of results',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(
+                            property: 'data',
+                            type: 'array',
+                            items: new OA\Items(ref: '#/components/schemas/PageSummary'),
+                        ),
+                        new OA\Property(property: 'links', ref: '#/components/schemas/PaginationLinks'),
+                        new OA\Property(property: 'meta', ref: '#/components/schemas/PaginationMeta'),
+                    ],
+                ),
+            ),
+        ],
+    )]
     public function pages(Request $request): AnonymousResourceCollection
     {
         $request->validate([
@@ -64,6 +129,32 @@ class PublicContentController extends Controller
         return PageSummaryResource::collection($pages);
     }
 
+    #[OA\Get(
+        path: '/api/public/pages/{slug}',
+        summary: 'Read one published page',
+        description: 'Answers 404 for a draft, for a page whose publish date has not arrived, and '.
+            'for a page filed under an inactive menu item. This is where scheduled publishing is '.
+            'enforced for readers.',
+        tags: ['Public'],
+        parameters: [
+            new OA\Parameter(
+                name: 'slug',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'string', example: 'who-we-are'),
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'The page',
+                content: new OA\JsonContent(
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/Page')],
+                ),
+            ),
+            new OA\Response(response: 404, description: 'Not published, not due, or no such page'),
+        ],
+    )]
     public function page(string $slug): PageResource
     {
         $page = Page::query()
