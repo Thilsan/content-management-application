@@ -1,9 +1,19 @@
 <?php
 
 it('strips markup and collapses whitespace into an excerpt', function (): void {
-    $html = "<h2>Title</h2>\n<p>Some <strong>bold</strong> copy&nbsp;here.</p>";
+    $html = "<p>Some <strong>bold</strong>\n copy&nbsp;here.</p>";
 
-    expect(html_excerpt($html, 20))->toBe('Title Some bold copy...');
+    expect(html_excerpt($html, 20))->toBe('Some bold copy here.');
+});
+
+it('starts the excerpt at the prose rather than the heading', function (): void {
+    $html = "<h2>A short history</h2>\n<p>We started in 2014 with three people.</p>";
+
+    expect(html_excerpt($html, 30))->toBe('We started in 2014 with three...');
+});
+
+it('falls back to the heading when the body has nothing else', function (): void {
+    expect(html_excerpt('<h2>Just a heading</h2>'))->toBe('Just a heading');
 });
 
 it('returns the whole text when it is shorter than the limit', function (): void {

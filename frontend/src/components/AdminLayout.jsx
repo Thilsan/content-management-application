@@ -30,7 +30,7 @@ export default function AdminLayout() {
   const location = useLocation()
 
   if (loading) {
-    return <p className="mx-auto max-w-[1120px] px-6 pt-8 text-[0.88rem] text-muted">Loading…</p>
+    return <p className="mx-auto max-w-280 px-6 pt-8 text-[0.88rem] text-muted">Loading…</p>
   }
 
   if (!user) {
@@ -89,7 +89,7 @@ export default function AdminLayout() {
         </button>
       </header>
 
-      <div className="mx-auto max-w-[1120px] px-6 pt-8 pb-16">
+      <div className="mx-auto max-w-280 px-6 pt-8 pb-16">
         <Outlet />
       </div>
     </>
