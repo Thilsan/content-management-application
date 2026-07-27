@@ -3,6 +3,9 @@ import 'package:flutter_html/flutter_html.dart';
 
 import '../api/models.dart';
 import '../api/session.dart';
+import '../format.dart';
+import '../theme.dart';
+import '../widgets/page_thumb.dart';
 
 /// One page, with the CKEditor body rendered as real markup rather than as a
 /// wall of escaped text.
@@ -27,10 +30,9 @@ class _PageScreenState extends State<PageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      appBar: AppBar(),
+      backgroundColor: AppColors.surface,
+      appBar: AppBar(backgroundColor: AppColors.surface),
       body: FutureBuilder<CmsPage>(
         future: _page,
         builder: (context, snapshot) {
@@ -41,39 +43,60 @@ class _PageScreenState extends State<PageScreen> {
           if (snapshot.hasError) {
             return Padding(
               padding: const EdgeInsets.all(32),
-              child: Center(child: Text('${snapshot.error}')),
+              child: Center(
+                child: Text(
+                  '${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppColors.muted),
+                ),
+              ),
             );
           }
 
           final page = snapshot.data!;
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 48),
             children: [
-              if (page.menuTitle != null)
-                Text(
-                  page.menuTitle!.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    letterSpacing: 1.1,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              const SizedBox(height: 6),
-              Text(page.title, style: theme.textTheme.headlineSmall),
-              const SizedBox(height: 8),
+              if (page.menuTitle != null) Eyebrow(page.menuTitle!),
+              const SizedBox(height: 10),
+
               Text(
-                page.publishedAt == null
-                    ? page.state
-                    : '${page.state} · ${_formatted(page.publishedAt!)}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                page.title,
+                style: const TextStyle(
+                  fontSize: 27,
+                  height: 1.2,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.7,
+                  color: AppColors.ink,
                 ),
               ),
 
+              const SizedBox(height: 14),
+
+              // Identity strip: the same colour this page carries in the list.
+              Row(
+                children: [
+                  PageThumb(page: page, size: 34, radius: 9),
+                  const SizedBox(width: 10),
+                  StateChip(state: page.state),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      [
+                        if (page.publishedAt != null) formatDate(page.publishedAt),
+                        '${readingMinutes(page.body)} min read',
+                      ].join(' · '),
+                      style: const TextStyle(fontSize: 12.5, color: AppColors.muted),
+                    ),
+                  ),
+                ],
+              ),
+
               if (page.coverImageUrl != null) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   child: Image.network(
                     page.coverImageUrl!,
                     fit: BoxFit.cover,
@@ -83,22 +106,50 @@ class _PageScreenState extends State<PageScreen> {
                 ),
               ],
 
-              const SizedBox(height: 8),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 18),
+                child: Divider(),
+              ),
+
               Html(
                 data: page.body ?? '',
                 style: {
                   'body': Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-                  'h2': Style(fontSize: FontSize(19), margin: Margins.only(top: 22, bottom: 6)),
-                  'h3': Style(fontSize: FontSize(16), margin: Margins.only(top: 16, bottom: 4)),
-                  'p': Style(fontSize: FontSize(15), lineHeight: LineHeight.number(1.55)),
-                  'li': Style(fontSize: FontSize(15), lineHeight: LineHeight.number(1.5)),
+                  'h2': Style(
+                    fontSize: FontSize(19),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                    margin: Margins.only(top: 24, bottom: 8),
+                  ),
+                  'h3': Style(
+                    fontSize: FontSize(16),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.ink,
+                    margin: Margins.only(top: 18, bottom: 6),
+                  ),
+                  'p': Style(
+                    fontSize: FontSize(15.5),
+                    lineHeight: LineHeight.number(1.6),
+                    color: const Color(0xFF1D2732),
+                    margin: Margins.only(bottom: 14),
+                  ),
+                  'li': Style(
+                    fontSize: FontSize(15.5),
+                    lineHeight: LineHeight.number(1.55),
+                    color: const Color(0xFF1D2732),
+                    margin: Margins.only(bottom: 6),
+                  ),
+                  'strong': Style(fontWeight: FontWeight.w600, color: AppColors.ink),
                   'blockquote': Style(
-                    margin: Margins.symmetric(vertical: 12),
-                    padding: HtmlPaddings.only(left: 12),
+                    margin: Margins.symmetric(vertical: 16),
+                    padding: HtmlPaddings.only(left: 14),
+                    color: AppColors.inkSoft,
+                    fontStyle: FontStyle.normal,
                     border: const Border(
-                      left: BorderSide(color: Color(0xFF2F6FED), width: 3),
+                      left: BorderSide(color: AppColors.accent, width: 3),
                     ),
                   ),
+                  'a': Style(color: AppColors.accent, textDecoration: TextDecoration.none),
                 },
               ),
             ],
@@ -106,16 +157,5 @@ class _PageScreenState extends State<PageScreen> {
         },
       ),
     );
-  }
-
-  String _formatted(DateTime value) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-
-    final local = value.toLocal();
-
-    return '${local.day} ${months[local.month - 1]} ${local.year}';
   }
 }

@@ -4,6 +4,7 @@ import 'api/api_client.dart';
 import 'api/session.dart';
 import 'screens/browse_screen.dart';
 import 'screens/login_screen.dart';
+import 'theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,10 +28,7 @@ class CmsApp extends StatelessWidget {
     return MaterialApp(
       title: 'CMS',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: const Color(0xFF2F6FED),
-        useMaterial3: true,
-      ),
+      theme: buildAppTheme(),
       home: ListenableBuilder(
         listenable: session,
         builder: (context, _) {
