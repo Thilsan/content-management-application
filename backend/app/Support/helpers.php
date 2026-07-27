@@ -43,7 +43,10 @@ if (! function_exists('html_excerpt')) {
     function html_excerpt(?string $html, int $limit = 160): string
     {
         $text = html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5);
-        $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+
+        // CKEditor emits plenty of &nbsp;, which decodes to U+00A0. That is not
+        // matched by \s, so collapse it alongside the ordinary whitespace.
+        $text = trim(preg_replace('/[\s\x{00a0}]+/u', ' ', $text) ?? '');
 
         return Str::limit($text, $limit);
     }

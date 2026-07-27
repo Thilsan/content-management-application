@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -56,11 +57,11 @@ class PageFactory extends Factory
     /**
      * Published, but with a publish date that has not arrived yet.
      */
-    public function scheduled(?string $when = null): static
+    public function scheduled(string $when = '+1 week'): static
     {
         return $this->state(fn () => [
             'status' => PageStatus::Published,
-            'published_at' => $when ? now()->parse($when) : now()->addWeek(),
+            'published_at' => Carbon::parse($when),
         ]);
     }
 
