@@ -11,6 +11,7 @@ guarded by a privilege that lives in the database, documented with OpenAPI and c
 ```
 backend/     Laravel API
 frontend/    React app (public site and back office)
+mobile/      Flutter client (optional extra)
 docker/      nginx and PHP-FPM images
 ```
 
@@ -245,10 +246,45 @@ the trash. Deleting for good also removes the cover file from disk.
 - **Page bodies are rendered as HTML** on the public site. The markup comes from CKEditor and an
   authenticated editor, which is the trust boundary a CMS accepts by design.
 
+## Mobile client
+
+A small read-only Flutter app in `mobile/`. It signs in against the same Sanctum endpoints the
+React app uses, browses the pages grouped under the menu, and opens one.
+
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
+
+It talks to `http://localhost:8000` by default, which is what an iOS simulator needs. An Android
+emulator reaches the host on a different address:
+
+```bash
+flutter run --dart-define=API_URL=http://10.0.2.2:8000
+```
+
+```bash
+flutter test      # 7 tests over the API client and the response parsing
+flutter analyze
+```
+
+Worth knowing: it reads the **authenticated** endpoints rather than the public ones, so signing
+in actually means something. Drafts and scheduled pages appear with a badge, exactly as they do
+in the back office, and the same privileges apply — a moderator gets the same 403s here as
+anywhere else. The token is kept on the device and checked against `/api/auth/me` on launch, so
+a revoked token drops you back to the sign in screen instead of an empty list.
+
+The page body is CKEditor HTML, rendered as markup with `flutter_html`.
+
+`ios/Runner/Info.plist` carries an `NSAllowsLocalNetworking` exception, without which iOS blocks
+the cleartext request to a local API. That is the narrow form of the exception; it does not
+permit arbitrary HTTP.
+
 ## Optional extras
 
 Of the three bonus items in the brief:
 
 - **Artisan command** — done. `pages:publish-due`, scheduled every minute, described above.
-- **Mobile app** — not built yet.
-- **Arabic / RTL** — not built yet.
+- **Mobile app** — done. Flutter client in `mobile/`, described above.
+- **Arabic / RTL** — not built.
