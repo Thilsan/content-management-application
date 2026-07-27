@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../api/models.dart';
 import '../api/session.dart';
-import '../format.dart';
+import '../locale_store.dart';
+import '../strings.dart';
 import '../theme.dart';
+import '../widgets/language_toggle.dart';
 import '../widgets/page_thumb.dart';
 import 'page_screen.dart';
 
@@ -16,9 +18,10 @@ class _Content {
 }
 
 class BrowseScreen extends StatefulWidget {
-  const BrowseScreen({super.key, required this.session});
+  const BrowseScreen({super.key, required this.session, required this.locales});
 
   final Session session;
+  final LocaleStore locales;
 
   @override
   State<BrowseScreen> createState() => _BrowseScreenState();
@@ -51,6 +54,8 @@ class _BrowseScreenState extends State<BrowseScreen> {
   @override
   Widget build(BuildContext context) {
     final user = widget.session.user;
+    final locale = widget.locales.locale;
+    final t = AppStrings.of(locale);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,21 +64,24 @@ class _BrowseScreenState extends State<BrowseScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Pages'),
+            Text(t.pages),
             if (user != null)
               Text(
-                user.roles.isEmpty ? user.name : '${user.name} · ${user.roles.join(', ')}',
+                user.roles.isEmpty
+                    ? user.name
+                    : '${user.name} · ${user.roles.join(', ')}',
                 style: const TextStyle(fontSize: 12, color: AppColors.muted),
               ),
           ],
         ),
         actions: [
+          LanguageToggle(locales: widget.locales),
           IconButton(
             icon: const Icon(Icons.logout, size: 20),
-            tooltip: 'Sign out',
+            tooltip: t.signOut,
             onPressed: widget.session.signOut,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(62),
@@ -82,11 +90,15 @@ class _BrowseScreenState extends State<BrowseScreen> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: TextField(
               onChanged: (value) => setState(() => _search = value),
-              decoration: const InputDecoration(
-                hintText: 'Search pages',
-                prefixIcon: Icon(Icons.search, size: 20, color: AppColors.muted),
+              decoration: InputDecoration(
+                hintText: t.searchPages,
+                prefixIcon: const Icon(
+                  Icons.search,
+                  size: 20,
+                  color: AppColors.muted,
+                ),
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
           ),
@@ -101,26 +113,30 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
           if (snapshot.hasError) {
             return _Message(
-              title: 'Could not load the pages',
+              title: t.couldNotLoad,
               detail: '${snapshot.error}',
               onRetry: _refresh,
+              retryLabel: t.tryAgain,
             );
           }
 
-          return RefreshIndicator(onRefresh: _refresh, child: _list(snapshot.data!));
+          return RefreshIndicator(
+            onRefresh: _refresh,
+            child: _list(snapshot.data!, locale, t),
+          );
         },
       ),
     );
   }
 
-  Widget _list(_Content content) {
+  Widget _list(_Content content, String locale, AppStrings t) {
     final term = _search.trim().toLowerCase();
 
     final matching = content.pages.where((page) {
       if (term.isEmpty) return true;
 
-      return page.title.toLowerCase().contains(term) ||
-          page.excerpt.toLowerCase().contains(term);
+      return page.titleIn(locale).toLowerCase().contains(term) ||
+          page.excerptIn(locale).toLowerCase().contains(term);
     }).toList();
 
     // Menu order decides the order pages appear in, exactly as on the website.
@@ -129,7 +145,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
     final children = <Widget>[];
 
     for (final entry in ordered) {
-      final pages = matching.where((page) => page.menuId == entry.node.id).toList();
+      final pages = matching
+          .where((page) => page.menuId == entry.node.id)
+          .toList();
 
       if (pages.isEmpty) continue;
 
@@ -138,7 +156,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
           padding: EdgeInsets.fromLTRB(20 + entry.depth * 12, 22, 20, 8),
           child: Row(
             children: [
-              Eyebrow(entry.node.title),
+              Eyebrow(entry.node.titleIn(locale)),
               const SizedBox(width: 10),
               const Expanded(child: Divider()),
             ],
@@ -150,7 +168,11 @@ class _BrowseScreenState extends State<BrowseScreen> {
         pages.map(
           (page) => Padding(
             padding: EdgeInsets.fromLTRB(16 + entry.depth * 8, 0, 16, 8),
-            child: _PageCard(page: page, session: widget.session),
+            child: _PageCard(
+              page: page,
+              session: widget.session,
+              locales: widget.locales,
+            ),
           ),
         ),
       );
@@ -160,10 +182,8 @@ class _BrowseScreenState extends State<BrowseScreen> {
       return ListView(
         children: [
           _Message(
-            title: term.isEmpty ? 'No pages yet' : 'Nothing matches “$_search”',
-            detail: term.isEmpty
-                ? 'Pages added in the back office show up here.'
-                : 'Try a shorter word.',
+            title: term.isEmpty ? t.noPages : t.noMatches,
+            detail: term.isEmpty ? t.noPagesDetail : t.tryShorter,
           ),
         ],
       );
@@ -177,13 +197,21 @@ class _BrowseScreenState extends State<BrowseScreen> {
 }
 
 class _PageCard extends StatelessWidget {
-  const _PageCard({required this.page, required this.session});
+  const _PageCard({
+    required this.page,
+    required this.session,
+    required this.locales,
+  });
 
   final CmsPage page;
   final Session session;
+  final LocaleStore locales;
 
   @override
   Widget build(BuildContext context) {
+    final locale = locales.locale;
+    final t = AppStrings.of(locale);
+
     return Material(
       color: AppColors.surface,
       borderRadius: BorderRadius.circular(14),
@@ -191,7 +219,8 @@ class _PageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => PageScreen(session: session, pageId: page.id),
+            builder: (_) =>
+                PageScreen(session: session, locales: locales, pageId: page.id),
           ),
         ),
         child: Ink(
@@ -214,7 +243,7 @@ class _PageCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            page.title,
+                            page.titleIn(locale),
                             style: const TextStyle(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w600,
@@ -224,12 +253,15 @@ class _PageCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        StateChip(state: page.state),
+                        StateChip(
+                          state: page.state,
+                          label: t.state(page.state),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      page.excerpt,
+                      page.excerptIn(locale),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -241,8 +273,11 @@ class _PageCard extends StatelessWidget {
                     if (page.publishedAt != null) ...[
                       const SizedBox(height: 7),
                       Text(
-                        formatDate(page.publishedAt),
-                        style: const TextStyle(fontSize: 11.5, color: AppColors.muted),
+                        t.date(page.publishedAt, locale),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.muted,
+                        ),
                       ),
                     ],
                   ],
@@ -257,11 +292,17 @@ class _PageCard extends StatelessWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message({required this.title, required this.detail, this.onRetry});
+  const _Message({
+    required this.title,
+    required this.detail,
+    this.onRetry,
+    this.retryLabel = 'Try again',
+  });
 
   final String title;
   final String detail;
   final Future<void> Function()? onRetry;
+  final String retryLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +327,7 @@ class _Message extends StatelessWidget {
           ),
           if (onRetry != null) ...[
             const SizedBox(height: 18),
-            OutlinedButton(onPressed: onRetry, child: const Text('Try again')),
+            OutlinedButton(onPressed: onRetry, child: Text(retryLabel)),
           ],
         ],
       ),

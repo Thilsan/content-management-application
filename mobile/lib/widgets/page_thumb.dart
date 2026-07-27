@@ -6,7 +6,12 @@ import '../theme.dart';
 /// The page's cover if it has one, otherwise a colour derived from its slug.
 /// Same formula as the web app, so a page keeps one identity on both.
 class PageThumb extends StatelessWidget {
-  const PageThumb({super.key, required this.page, this.size = 46, this.radius = 12});
+  const PageThumb({
+    super.key,
+    required this.page,
+    this.size = 46,
+    this.radius = 12,
+  });
 
   final CmsPage page;
   final double size;
@@ -71,9 +76,12 @@ class PageThumb extends StatelessWidget {
 }
 
 class StateChip extends StatelessWidget {
-  const StateChip({super.key, required this.state});
+  const StateChip({super.key, required this.state, this.label});
 
+  /// The canonical state decides the colour; the label is what gets shown, so
+  /// it can be translated without changing the meaning.
   final String state;
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
@@ -95,11 +103,14 @@ class StateChip extends StatelessWidget {
           Container(
             width: 5,
             height: 5,
-            decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: foreground,
+              shape: BoxShape.circle,
+            ),
           ),
           const SizedBox(width: 5),
           Text(
-            state,
+            label ?? state,
             style: TextStyle(
               fontSize: 11,
               color: foreground,

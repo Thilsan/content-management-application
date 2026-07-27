@@ -16,6 +16,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 3),
         new OA\Property(property: 'title', description: 'Resolved for the requested language.', type: 'string', example: 'Careers'),
+        new OA\Property(property: 'title_ar', type: 'string', nullable: true, example: 'الوظائف'),
         new OA\Property(property: 'slug', type: 'string', example: 'careers'),
     ],
 )]
@@ -29,6 +30,7 @@ class MenuSummaryResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->titleIn(requested_locale()),
+            'title_ar' => $this->title_ar,
             'slug' => $this->slug,
         ];
     }

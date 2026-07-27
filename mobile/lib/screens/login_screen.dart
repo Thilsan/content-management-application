@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../api/api_client.dart';
 import '../api/session.dart';
+import '../locale_store.dart';
+import '../strings.dart';
 import '../theme.dart';
+import '../widgets/language_toggle.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key, required this.session});
+  const LoginScreen({super.key, required this.session, required this.locales});
 
   final Session session;
+  final LocaleStore locales;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -44,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
         _emailError = error.errors['email']?.first;
       });
     } catch (_) {
-      setState(() => _message = 'Could not reach the API. Is the backend running?');
+      setState(
+        () => _message = AppStrings.of(widget.locales.locale).couldNotReach,
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -62,6 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppStrings.of(widget.locales.locale);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -74,7 +82,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: LanguageToggle(locales: widget.locales),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
                     child: Container(
                       width: 52,
                       height: 52,
@@ -99,9 +114,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   const SizedBox(height: 26),
-                  const Text(
-                    'Sign in',
-                    style: TextStyle(
+                  Text(
+                    t.signIn,
+                    style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w600,
                       letterSpacing: -0.8,
@@ -109,15 +124,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Browse the pages your role gives you access to.',
-                    style: TextStyle(fontSize: 14.5, color: AppColors.inkSoft, height: 1.45),
+                  Text(
+                    t.signInBlurb,
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      color: AppColors.inkSoft,
+                      height: 1.45,
+                    ),
                   ),
 
                   if (_message != null) ...[
                     const SizedBox(height: 20),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 11,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDF2F1),
                         borderRadius: BorderRadius.circular(10),
@@ -127,7 +149,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text(
                         _message!,
-                        style: const TextStyle(fontSize: 13.5, color: Color(0xFFC0392F)),
+                        style: const TextStyle(
+                          fontSize: 13.5,
+                          color: Color(0xFFC0392F),
+                        ),
                       ),
                     ),
                   ],
@@ -135,12 +160,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 26),
                   TextField(
                     controller: _email,
+                    textDirection: TextDirection.ltr,
                     keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     enabled: !_busy,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: t.email,
                       hintText: 'you@example.com',
                       errorText: _emailError,
                     ),
@@ -148,15 +174,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 14),
                   TextField(
                     controller: _password,
+                    textDirection: TextDirection.ltr,
                     obscureText: _obscured,
                     enabled: !_busy,
                     textInputAction: TextInputAction.go,
                     onSubmitted: (_) => _busy ? null : _submit(),
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: t.password,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          _obscured
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                           size: 20,
                           color: AppColors.muted,
                         ),
@@ -177,27 +206,30 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Sign in'),
+                        : Text(t.signIn),
                   ),
 
                   const SizedBox(height: 30),
-                  const Eyebrow('Seeded accounts'),
+                  Eyebrow(t.seededAccounts),
                   const SizedBox(height: 10),
                   _DemoAccount(
                     email: 'admin@cms.test',
-                    detail: 'Administrator · every privilege',
+                    detail: t.adminDetail,
                     onTap: () => _use('admin@cms.test'),
                   ),
                   const SizedBox(height: 8),
                   _DemoAccount(
                     email: 'moderator@cms.test',
-                    detail: 'Moderator · pages only, no deletes',
+                    detail: t.moderatorDetail,
                     onTap: () => _use('moderator@cms.test'),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Tap one to fill the form. Password is “password”.',
-                    style: TextStyle(fontSize: 12.5, color: AppColors.muted),
+                  Text(
+                    t.tapToFill,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.muted,
+                    ),
                   ),
                 ],
               ),
@@ -210,7 +242,11 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class _DemoAccount extends StatelessWidget {
-  const _DemoAccount({required this.email, required this.detail, required this.onTap});
+  const _DemoAccount({
+    required this.email,
+    required this.detail,
+    required this.onTap,
+  });
 
   final String email;
   final String detail;
@@ -238,6 +274,7 @@ class _DemoAccount extends StatelessWidget {
                   children: [
                     Text(
                       email,
+                      textDirection: TextDirection.ltr,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -247,7 +284,10 @@ class _DemoAccount extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       detail,
-                      style: const TextStyle(fontSize: 12.5, color: AppColors.muted),
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppColors.muted,
+                      ),
                     ),
                   ],
                 ),

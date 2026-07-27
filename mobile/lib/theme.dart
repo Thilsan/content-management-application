@@ -44,7 +44,11 @@ ThemeData buildAppTheme() {
         letterSpacing: -0.3,
       ),
     ),
-    dividerTheme: const DividerThemeData(color: AppColors.line, thickness: 1, space: 1),
+    dividerTheme: const DividerThemeData(
+      color: AppColors.line,
+      thickness: 1,
+      space: 1,
+    ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,

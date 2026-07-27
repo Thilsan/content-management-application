@@ -4,15 +4,23 @@ import 'package:flutter_html/flutter_html.dart';
 import '../api/models.dart';
 import '../api/session.dart';
 import '../format.dart';
+import '../locale_store.dart';
+import '../strings.dart';
 import '../theme.dart';
 import '../widgets/page_thumb.dart';
 
 /// One page, with the CKEditor body rendered as real markup rather than as a
 /// wall of escaped text.
 class PageScreen extends StatefulWidget {
-  const PageScreen({super.key, required this.session, required this.pageId});
+  const PageScreen({
+    super.key,
+    required this.session,
+    required this.locales,
+    required this.pageId,
+  });
 
   final Session session;
+  final LocaleStore locales;
   final int pageId;
 
   @override
@@ -30,6 +38,9 @@ class _PageScreenState extends State<PageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = widget.locales.locale;
+    final t = AppStrings.of(locale);
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppBar(backgroundColor: AppColors.surface),
@@ -58,11 +69,12 @@ class _PageScreenState extends State<PageScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 48),
             children: [
-              if (page.menuTitle != null) Eyebrow(page.menuTitle!),
+              if (page.menuTitleIn(locale) != null)
+                Eyebrow(page.menuTitleIn(locale)!),
               const SizedBox(height: 10),
 
               Text(
-                page.title,
+                page.titleIn(locale),
                 style: const TextStyle(
                   fontSize: 27,
                   height: 1.2,
@@ -79,15 +91,19 @@ class _PageScreenState extends State<PageScreen> {
                 children: [
                   PageThumb(page: page, size: 34, radius: 9),
                   const SizedBox(width: 10),
-                  StateChip(state: page.state),
+                  StateChip(state: page.state, label: t.state(page.state)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       [
-                        if (page.publishedAt != null) formatDate(page.publishedAt),
-                        '${readingMinutes(page.body)} min read',
+                        if (page.publishedAt != null)
+                          t.date(page.publishedAt, locale),
+                        '${readingMinutes(page.bodyIn(locale))} ${t.minRead}',
                       ].join(' · '),
-                      style: const TextStyle(fontSize: 12.5, color: AppColors.muted),
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppColors.muted,
+                      ),
                     ),
                   ),
                 ],
@@ -106,51 +122,88 @@ class _PageScreenState extends State<PageScreen> {
                 ),
               ],
 
+              if (locale == 'ar' && !page.isTranslated)
+                Container(
+                  margin: const EdgeInsets.only(top: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.canvas,
+                    borderRadius: BorderRadius.circular(10),
+                    border: const Border(
+                      left: BorderSide(color: AppColors.line, width: 3),
+                    ),
+                  ),
+                  child: Text(
+                    t.onlyInEnglish,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.inkSoft,
+                    ),
+                  ),
+                ),
+
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 18),
                 child: Divider(),
               ),
 
-              Html(
-                data: page.body ?? '',
-                style: {
-                  'body': Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-                  'h2': Style(
-                    fontSize: FontSize(19),
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
-                    margin: Margins.only(top: 24, bottom: 8),
-                  ),
-                  'h3': Style(
-                    fontSize: FontSize(16),
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
-                    margin: Margins.only(top: 18, bottom: 6),
-                  ),
-                  'p': Style(
-                    fontSize: FontSize(15.5),
-                    lineHeight: LineHeight.number(1.6),
-                    color: const Color(0xFF1D2732),
-                    margin: Margins.only(bottom: 14),
-                  ),
-                  'li': Style(
-                    fontSize: FontSize(15.5),
-                    lineHeight: LineHeight.number(1.55),
-                    color: const Color(0xFF1D2732),
-                    margin: Margins.only(bottom: 6),
-                  ),
-                  'strong': Style(fontWeight: FontWeight.w600, color: AppColors.ink),
-                  'blockquote': Style(
-                    margin: Margins.symmetric(vertical: 16),
-                    padding: HtmlPaddings.only(left: 14),
-                    color: AppColors.inkSoft,
-                    fontStyle: FontStyle.normal,
-                    border: const Border(
-                      left: BorderSide(color: AppColors.accent, width: 3),
+              Directionality(
+                textDirection: page.readsRtlIn(locale)
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                child: Html(
+                  data: page.bodyIn(locale) ?? '',
+                  style: {
+                    'body': Style(
+                      margin: Margins.zero,
+                      padding: HtmlPaddings.zero,
                     ),
-                  ),
-                  'a': Style(color: AppColors.accent, textDecoration: TextDecoration.none),
-                },
+                    'h2': Style(
+                      fontSize: FontSize(19),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                      margin: Margins.only(top: 24, bottom: 8),
+                    ),
+                    'h3': Style(
+                      fontSize: FontSize(16),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                      margin: Margins.only(top: 18, bottom: 6),
+                    ),
+                    'p': Style(
+                      fontSize: FontSize(15.5),
+                      lineHeight: LineHeight.number(1.6),
+                      color: const Color(0xFF1D2732),
+                      margin: Margins.only(bottom: 14),
+                    ),
+                    'li': Style(
+                      fontSize: FontSize(15.5),
+                      lineHeight: LineHeight.number(1.55),
+                      color: const Color(0xFF1D2732),
+                      margin: Margins.only(bottom: 6),
+                    ),
+                    'strong': Style(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                    ),
+                    'blockquote': Style(
+                      margin: Margins.symmetric(vertical: 16),
+                      padding: HtmlPaddings.only(left: 14),
+                      color: AppColors.inkSoft,
+                      fontStyle: FontStyle.normal,
+                      border: const Border(
+                        left: BorderSide(color: AppColors.accent, width: 3),
+                      ),
+                    ),
+                    'a': Style(
+                      color: AppColors.accent,
+                      textDecoration: TextDecoration.none,
+                    ),
+                  },
+                ),
               ),
             ],
           );

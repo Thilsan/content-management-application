@@ -30,21 +30,23 @@ void main() {
   test('login returns the token and the privileges the user holds', () async {
     late http.Request seen;
 
-    final api = clientReturning(
-      {
-        'data': {
-          'id': 2,
-          'name': 'Content Moderator',
-          'email': 'moderator@cms.test',
-          'roles': [
-            {'id': 2, 'name': 'Moderator', 'slug': 'moderator'},
-          ],
-          'privileges': ['menus.view', 'pages.create', 'pages.update', 'pages.view'],
-        },
-        'token': '4|abcdef',
+    final api = clientReturning({
+      'data': {
+        'id': 2,
+        'name': 'Content Moderator',
+        'email': 'moderator@cms.test',
+        'roles': [
+          {'id': 2, 'name': 'Moderator', 'slug': 'moderator'},
+        ],
+        'privileges': [
+          'menus.view',
+          'pages.create',
+          'pages.update',
+          'pages.view',
+        ],
       },
-      inspect: (request) => seen = request,
-    );
+      'token': '4|abcdef',
+    }, inspect: (request) => seen = request);
 
     final result = await api.login('moderator@cms.test', 'password');
 
@@ -59,7 +61,9 @@ void main() {
   test('the token is sent as a bearer header once set', () async {
     late http.Request seen;
 
-    final api = clientReturning({'data': []}, inspect: (request) => seen = request);
+    final api = clientReturning({
+      'data': [],
+    }, inspect: (request) => seen = request);
     api.token = 'secret-token';
 
     await api.menus();
@@ -69,32 +73,37 @@ void main() {
   });
 
   test('a 422 surfaces the field errors', () async {
-    final api = clientReturning(
-      {
-        'message': 'These credentials do not match our records.',
-        'errors': {
-          'email': ['These credentials do not match our records.'],
-        },
+    final api = clientReturning({
+      'message': 'These credentials do not match our records.',
+      'errors': {
+        'email': ['These credentials do not match our records.'],
       },
-      status: 422,
-    );
+    }, status: 422);
 
     expect(
       () => api.login('nobody@cms.test', 'wrong'),
       throwsA(
         isA<ApiException>()
             .having((error) => error.status, 'status', 422)
-            .having((error) => error.errors['email']?.first, 'email error', isNotNull),
+            .having(
+              (error) => error.errors['email']?.first,
+              'email error',
+              isNotNull,
+            ),
       ),
     );
   });
 
   test('a 403 from a privilege check is reported, not swallowed', () async {
-    final api = clientReturning({'message': 'This action is unauthorized.'}, status: 403);
+    final api = clientReturning({
+      'message': 'This action is unauthorized.',
+    }, status: 403);
 
     expect(
       () => api.pages(),
-      throwsA(isA<ApiException>().having((error) => error.status, 'status', 403)),
+      throwsA(
+        isA<ApiException>().having((error) => error.status, 'status', 403),
+      ),
     );
   });
 
@@ -158,7 +167,12 @@ void main() {
               'title': 'Careers',
               'slug': 'careers',
               'children': [
-                {'id': 4, 'title': 'Interns', 'slug': 'interns', 'children': []},
+                {
+                  'id': 4,
+                  'title': 'Interns',
+                  'slug': 'interns',
+                  'children': [],
+                },
               ],
             },
           ],
@@ -166,7 +180,9 @@ void main() {
       ],
     });
 
-    final flattened = (await api.menus()).expand((node) => node.flatten()).toList();
+    final flattened = (await api.menus())
+        .expand((node) => node.flatten())
+        .toList();
 
     expect(flattened.map((entry) => entry.node.title), [
       'About',
@@ -180,7 +196,9 @@ void main() {
   test('a search term reaches the query string', () async {
     late http.Request seen;
 
-    final api = clientReturning({'data': []}, inspect: (request) => seen = request);
+    final api = clientReturning({
+      'data': [],
+    }, inspect: (request) => seen = request);
 
     await api.pages(search: 'report');
 

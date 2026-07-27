@@ -305,9 +305,16 @@ flutter run --dart-define=API_URL=http://10.0.2.2:8000
 ```
 
 ```bash
-flutter test      # 7 tests over the API client and the response parsing
+flutter test      # 16 tests over the API client, parsing and the language rules
 flutter analyze
 ```
+
+The app is bilingual too, with an **EN / عربي** toggle in the app bar. Flutter mirrors the whole
+tree once it knows the locale, so there is no separate RTL layout to maintain. It reads the
+authenticated endpoints, which return raw `title_ar` and `body_ar` rather than a resolved
+language, so the same all-or-nothing fallback rule is applied on the device — covered by tests so
+the phone and the website cannot drift apart. A page's own body carries its own direction, so an
+English fallback inside an Arabic app still reads left to right.
 
 Worth knowing: it reads the **authenticated** endpoints rather than the public ones, so signing
 in actually means something. Drafts and scheduled pages appear with a badge, exactly as they do
@@ -331,4 +338,4 @@ All three are done:
 - **Mobile app** — Flutter client in `mobile/`, described above.
 - **Arabic / RTL** — bilingual pages with a per page fallback, described above.
 
-The mobile client stays English only; the brief asks for RTL on the public site.
+Arabic works on the website and in the mobile client.

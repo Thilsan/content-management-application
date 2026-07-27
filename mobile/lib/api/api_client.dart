@@ -56,7 +56,9 @@ class ApiClient {
       request.body = jsonEncode(body);
     }
 
-    final response = await http.Response.fromStream(await _client.send(request));
+    final response = await http.Response.fromStream(
+      await _client.send(request),
+    );
 
     final decoded = response.body.isEmpty
         ? <String, dynamic>{}
@@ -90,11 +92,7 @@ class ApiClient {
     final response = await _send(
       'POST',
       '/auth/login',
-      body: {
-        'email': email,
-        'password': password,
-        'device_name': 'mobile',
-      },
+      body: {'email': email, 'password': password, 'device_name': 'mobile'},
     );
 
     return (
