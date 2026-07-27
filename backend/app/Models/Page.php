@@ -19,8 +19,10 @@ class Page extends Model
     protected $fillable = [
         'menu_id',
         'title',
+        'title_ar',
         'slug',
         'body',
+        'body_ar',
         'cover_image',
         'status',
         'published_at',
@@ -105,6 +107,28 @@ class Page extends Model
     public function isVisible(): bool
     {
         return (bool) $this->is_live;
+    }
+
+    /**
+     * Arabic when it exists, English otherwise. A half translated page still
+     * reads, rather than showing an empty title next to Arabic prose.
+     */
+    public function titleIn(string $locale): string
+    {
+        return $locale === 'ar' && filled($this->title_ar) ? $this->title_ar : $this->title;
+    }
+
+    public function bodyIn(string $locale): string
+    {
+        return $locale === 'ar' && filled($this->body_ar) ? $this->body_ar : $this->body;
+    }
+
+    /** Whether this page can actually be read in the given language. */
+    public function hasTranslation(string $locale): bool
+    {
+        return $locale === 'ar'
+            ? filled($this->title_ar) && filled($this->body_ar)
+            : true;
     }
 
     public function coverImageUrl(): ?string

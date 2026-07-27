@@ -16,6 +16,7 @@ class UpdatePageRequest extends FormRequest
         return [
             'menu_id' => ['sometimes', 'integer', Rule::exists('menus', 'id')],
             'title' => ['sometimes', 'string', 'max:200'],
+            'title_ar' => ['nullable', 'string', 'max:200'],
             'slug' => [
                 'sometimes',
                 'string',
@@ -24,6 +25,7 @@ class UpdatePageRequest extends FormRequest
                 Rule::unique('pages', 'slug')->ignore($this->route('page')),
             ],
             'body' => ['sometimes', 'string'],
+            'body_ar' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'remove_cover' => ['sometimes', 'boolean'],
             'status' => ['sometimes', Rule::enum(PageStatus::class)],

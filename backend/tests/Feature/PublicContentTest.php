@@ -68,7 +68,9 @@ it('treats a published page with no date as live', function (): void {
 
     $this->getJson("/api/public/pages/{$page->slug}")
         ->assertOk()
-        ->assertJsonPath('data.is_visible', true);
+        ->assertJsonPath('data.slug', $page->slug);
+
+    expect($page->fresh()->is_live)->toBeTrue();
 });
 
 it('hides everything filed under an inactive menu item', function (): void {

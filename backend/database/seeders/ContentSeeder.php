@@ -24,7 +24,9 @@ class ContentSeeder extends Seeder
                 ->forceFill([
                     'menu_id' => $menu->id,
                     'title' => $data['title'],
+                    'title_ar' => $data['title_ar'] ?? null,
                     'body' => $data['body'],
+                    'body_ar' => $data['body_ar'] ?? null,
                     'status' => $data['status'],
                     'published_at' => $data['published_at'],
                     'position' => $data['position'],
@@ -45,6 +47,7 @@ class ContentSeeder extends Seeder
                 ['slug' => $item['slug']],
                 [
                     'title' => $item['title'],
+                    'title_ar' => $item['title_ar'] ?? null,
                     'parent_id' => $parentId,
                     'position' => $position,
                     'is_active' => true,
@@ -63,21 +66,24 @@ class ContentSeeder extends Seeder
         return [
             [
                 'title' => 'About',
+                'title_ar' => 'من نحن',
                 'slug' => 'about',
                 'children' => [
-                    ['title' => 'Our Team', 'slug' => 'our-team'],
-                    ['title' => 'Careers', 'slug' => 'careers'],
+                    ['title' => 'Our Team', 'title_ar' => 'فريقنا', 'slug' => 'our-team'],
+                    ['title' => 'Careers', 'title_ar' => 'الوظائف', 'slug' => 'careers'],
                 ],
             ],
             [
                 'title' => 'Services',
+                'title_ar' => 'خدماتنا',
                 'slug' => 'services',
                 'children' => [
-                    ['title' => 'Consulting', 'slug' => 'consulting'],
+                    ['title' => 'Consulting', 'title_ar' => 'الاستشارات', 'slug' => 'consulting'],
                 ],
             ],
             [
                 'title' => 'News',
+                'title_ar' => 'الأخبار',
                 'slug' => 'news',
             ],
         ];
@@ -96,6 +102,7 @@ class ContentSeeder extends Seeder
             [
                 'menu' => 'about',
                 'title' => 'Who We Are',
+                'title_ar' => 'من نحن',
                 'slug' => 'who-we-are',
                 'status' => PageStatus::Published,
                 'published_at' => now()->subMonths(2),
@@ -125,10 +132,31 @@ class ContentSeeder extends Seeder
                     <p>Most conversations start with a short call and a look at what already exists. There
                     is no charge for that, and no expectation of anything afterwards.</p>
                     HTML,
+                'body_ar' => <<<'HTML'
+                    <h2>لمحة عن تاريخنا</h2>
+                    <p>بدأنا في عام 2014 بثلاثة أشخاص وفكرة منتج واحدة. واليوم نساعد المؤسسات في المنطقة
+                    على إيصال محتواها إلى من يحتاجه.</p>
+                    <p>قضينا السنوات الأولى مع عميل واحد تقريبًا. كانت تلك طريقة جيدة لتعلّم المجال،
+                    وطريقة سيئة لبناء شركة، فخصصنا عام 2017 لتوسيع قاعدة عملائنا.</p>
+                    <h2>كيف ننظّم عملنا</h2>
+                    <p>ينقسم عملنا إلى ثلاثة مجالات: الاستراتيجية والتنفيذ والدعم طويل الأمد. يتولى كل
+                    مجال فريق صغير يبقى مع العميل من الورشة الأولى وحتى النهاية.</p>
+                    <ul>
+                        <li>مكاتب في كولومبو ودبي</li>
+                        <li>اثنان وأربعون شخصًا في الهندسة والتصميم والتنفيذ</li>
+                        <li>عملاء في التجزئة والخدمات اللوجستية والقطاع العام</li>
+                    </ul>
+                    <h2>ما الذي يهمنا</h2>
+                    <p>أمران أساسًا: أن يتحدث من ينفّذ العمل مع من طلبه، وأن يكون ما نسلّمه قابلًا
+                    للصيانة من شخص لم يلتقِ بنا قط.</p>
+                    <blockquote><p>أفضل دليل على نجاح المشروع أن لا يحتاج أحد للاتصال بنا بشأنه بعد
+                    عام.</p></blockquote>
+                    HTML,
             ],
             [
                 'menu' => 'our-team',
                 'title' => 'Leadership',
+                'title_ar' => 'القيادة',
                 'slug' => 'leadership',
                 'status' => PageStatus::Published,
                 'published_at' => now()->subMonth(),
@@ -148,6 +176,16 @@ class ContentSeeder extends Seeder
                     <h2>Talking to them</h2>
                     <p>Every member of the team keeps two hours a week free for anyone in the company to
                     book, no agenda required.</p>
+                    HTML,
+                'body_ar' => <<<'HTML'
+                    <h2>الفريق الذي يدير العمل</h2>
+                    <p>فريق القيادة لدينا صغير عن قصد. لا يزال كل فرد فيه يقضي جزءًا من أسبوعه في العمل
+                    مع العملاء، ما يبقي القرارات قريبة من التنفيذ.</p>
+                    <h2>كيف تُتخذ القرارات</h2>
+                    <p>يجتمع الفريق كل اثنين لمراجعة خطة العمل، ومرة أخرى يوم الخميس لمتابعة ما تأخر.
+                    تُرسل ملاحظات الاجتماعين إلى الشركة كلها في اليوم نفسه.</p>
+                    <h2>التواصل معهم</h2>
+                    <p>يخصص كل عضو ساعتين أسبوعيًا يمكن لأي موظف حجزهما دون جدول أعمال.</p>
                     HTML,
             ],
             [
@@ -182,6 +220,7 @@ class ContentSeeder extends Seeder
             [
                 'menu' => 'services',
                 'title' => 'What We Do',
+                'title_ar' => 'ماذا نفعل',
                 'slug' => 'what-we-do',
                 'status' => PageStatus::Published,
                 'published_at' => now()->subMonths(4),
@@ -203,6 +242,19 @@ class ContentSeeder extends Seeder
                     about yet.</p>
                     <p>Most engagements start with a two week discovery so both sides know what is being
                     signed up for before any code is written.</p>
+                    HTML,
+                'body_ar' => <<<'HTML'
+                    <h2>خدماتنا</h2>
+                    <p>نعمل بثلاث صيغ: مشروع بنطاق محدد، أو فريق تنفيذ يعمل معكم لفترة أطول، أو مراجعة
+                    قصيرة لنظام قائم بالفعل.</p>
+                    <h2>مشاريع بنطاق محدد</h2>
+                    <p>مناسبة عندما تكون المشكلة واضحة والموعد النهائي أهم من المرونة. نحدد السعر
+                    والتاريخ، ويبقيان ثابتين ما لم يتغير النطاق كتابةً.</p>
+                    <h2>فرق التنفيذ</h2>
+                    <p>فريق دائم من ثلاثة إلى ستة أشخاص يعمل وفق خطتكم. معظم علاقاتنا طويلة الأمد تأخذ
+                    هذا الشكل.</p>
+                    <h2>المراجعات</h2>
+                    <p>أسبوع أو أسبوعان في قراءة الشيفرة والحديث مع الفريق وتدوين ما وجدناه.</p>
                     HTML,
             ],
             [
@@ -231,6 +283,7 @@ class ContentSeeder extends Seeder
             [
                 'menu' => 'news',
                 'title' => 'Company Update',
+                'title_ar' => 'تحديث الشركة',
                 'slug' => 'company-update',
                 'status' => PageStatus::Published,
                 'published_at' => now()->subDays(5),
@@ -249,6 +302,18 @@ class ContentSeeder extends Seeder
                     <h2>What is next</h2>
                     <p>The next update goes out at the end of the quarter, with the annual report following
                     in the new year.</p>
+                    HTML,
+                'body_ar' => <<<'HTML'
+                    <h2>أين نقف الآن</h2>
+                    <p>أُغلق النصف الأول من العام قبل الموعد المخطط له. انضم عميلان جديدان وكبر فريق
+                    الدعم بأربعة أشخاص.</p>
+                    <h2>التنفيذ</h2>
+                    <p>صدرت إحدى عشرة نسخة، تأخرت اثنتان منها أسبوعًا واحدًا للسبب نفسه.</p>
+                    <h2>الفريق</h2>
+                    <p>انضم أربعة أشخاص إلى الدعم وانتقل واحد من فريق التنفيذ. ما زلنا نبحث عن مهندس
+                    واجهات ثانٍ.</p>
+                    <h2>ما هو قادم</h2>
+                    <p>التحديث القادم في نهاية الربع، ويليه التقرير السنوي في العام الجديد.</p>
                     HTML,
             ],
             [

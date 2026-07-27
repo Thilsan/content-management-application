@@ -16,8 +16,10 @@ class StorePageRequest extends FormRequest
         return [
             'menu_id' => ['required', 'integer', Rule::exists('menus', 'id')],
             'title' => ['required', 'string', 'max:200'],
+            'title_ar' => ['nullable', 'string', 'max:200'],
             'slug' => ['nullable', 'string', 'max:220', 'alpha_dash', Rule::unique('pages', 'slug')],
             'body' => ['required', 'string'],
+            'body_ar' => ['nullable', 'string'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'status' => ['required', Rule::enum(PageStatus::class)],
             'published_at' => ['nullable', 'date'],

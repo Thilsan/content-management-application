@@ -36,6 +36,36 @@ if (! function_exists('unique_slug')) {
     }
 }
 
+if (! function_exists('supported_locales')) {
+    /**
+     * @return array<string, string> locale => text direction
+     */
+    function supported_locales(): array
+    {
+        return ['en' => 'ltr', 'ar' => 'rtl'];
+    }
+}
+
+if (! function_exists('requested_locale')) {
+    /**
+     * The language a public request asked for through ?lang=, falling back to
+     * English for anything unrecognised.
+     */
+    function requested_locale(): string
+    {
+        $locale = (string) request()->query('lang', 'en');
+
+        return array_key_exists($locale, supported_locales()) ? $locale : 'en';
+    }
+}
+
+if (! function_exists('locale_direction')) {
+    function locale_direction(string $locale): string
+    {
+        return supported_locales()[$locale] ?? 'ltr';
+    }
+}
+
 if (! function_exists('html_excerpt')) {
     /**
      * Turn CKEditor markup into a short plain text summary for list views.

@@ -18,6 +18,7 @@ class Menu extends Model
     protected $fillable = [
         'parent_id',
         'title',
+        'title_ar',
         'slug',
         'position',
         'is_active',
@@ -56,6 +57,11 @@ class Menu extends Model
     public function pages(): HasMany
     {
         return $this->hasMany(Page::class);
+    }
+
+    public function titleIn(string $locale): string
+    {
+        return $locale === 'ar' && filled($this->title_ar) ? $this->title_ar : $this->title;
     }
 
     public function scopeActive(Builder $query): void

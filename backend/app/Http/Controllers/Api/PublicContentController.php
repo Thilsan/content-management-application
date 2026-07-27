@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuResource;
-use App\Http\Resources\PageResource;
-use App\Http\Resources\PageSummaryResource;
+use App\Http\Resources\PublicPageResource;
+use App\Http\Resources\PublicPageSummaryResource;
 use App\Models\Menu;
 use App\Models\Page;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +29,14 @@ class PublicContentController extends Controller
         description: 'No token required. Inactive menu items are left out, along with everything '.
             'nested under them. Each item carries only the pages that are published and due.',
         tags: ['Public'],
+        parameters: [
+            new OA\Parameter(
+                name: 'lang',
+                description: 'Language to serve. Falls back to English where a page has no Arabic.',
+                in: 'query',
+                schema: new OA\Schema(type: 'string', enum: ['en', 'ar'], default: 'en'),
+            ),
+        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -68,6 +76,12 @@ class PublicContentController extends Controller
         tags: ['Public'],
         parameters: [
             new OA\Parameter(
+                name: 'lang',
+                description: 'Language to serve. Falls back to English where a page has no Arabic.',
+                in: 'query',
+                schema: new OA\Schema(type: 'string', enum: ['en', 'ar'], default: 'en'),
+            ),
+            new OA\Parameter(
                 name: 'menu',
                 description: 'Slug of a menu item to filter by.',
                 in: 'query',
@@ -93,7 +107,7 @@ class PublicContentController extends Controller
                         new OA\Property(
                             property: 'data',
                             type: 'array',
-                            items: new OA\Items(ref: '#/components/schemas/PageSummary'),
+                            items: new OA\Items(ref: '#/components/schemas/PublicPageSummary'),
                         ),
                         new OA\Property(property: 'links', ref: '#/components/schemas/PaginationLinks'),
                         new OA\Property(property: 'meta', ref: '#/components/schemas/PaginationMeta'),
@@ -105,6 +119,7 @@ class PublicContentController extends Controller
     public function pages(Request $request): AnonymousResourceCollection
     {
         $request->validate([
+            'lang' => ['nullable', 'in:en,ar'],
             'menu' => ['nullable', 'string', 'max:140'],
             'search' => ['nullable', 'string', 'max:200'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
@@ -119,14 +134,17 @@ class PublicContentController extends Controller
             ->when($request->filled('search'), function (Builder $query) use ($request): void {
                 $term = addcslashes(trim((string) $request->input('search')), '%_\\');
 
-                $query->where('title', 'like', "%{$term}%");
+                $query->where(function (Builder $query) use ($term): void {
+                    $query->where('title', 'like', "%{$term}%")
+                        ->orWhere('title_ar', 'like', "%{$term}%");
+                });
             })
             ->orderBy('position')
             ->orderBy('title')
             ->paginate($request->integer('per_page', 12))
             ->withQueryString();
 
-        return PageSummaryResource::collection($pages);
+        return PublicPageSummaryResource::collection($pages);
     }
 
     #[OA\Get(
@@ -137,6 +155,12 @@ class PublicContentController extends Controller
             'enforced for readers.',
         tags: ['Public'],
         parameters: [
+            new OA\Parameter(
+                name: 'lang',
+                description: 'Language to serve. Falls back to English where a page has no Arabic.',
+                in: 'query',
+                schema: new OA\Schema(type: 'string', enum: ['en', 'ar'], default: 'en'),
+            ),
             new OA\Parameter(
                 name: 'slug',
                 in: 'path',
@@ -149,13 +173,13 @@ class PublicContentController extends Controller
                 response: 200,
                 description: 'The page',
                 content: new OA\JsonContent(
-                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/Page')],
+                    properties: [new OA\Property(property: 'data', ref: '#/components/schemas/PublicPage')],
                 ),
             ),
             new OA\Response(response: 404, description: 'Not published, not due, or no such page'),
         ],
     )]
-    public function page(string $slug): PageResource
+    public function page(string $slug): PublicPageResource
     {
         $page = Page::query()
             ->visible()
@@ -164,6 +188,6 @@ class PublicContentController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return PageResource::make($page);
+        return PublicPageResource::make($page);
     }
 }

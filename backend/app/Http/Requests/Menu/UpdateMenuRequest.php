@@ -17,6 +17,7 @@ class UpdateMenuRequest extends FormRequest
         return [
             'parent_id' => ['nullable', 'integer', Rule::exists('menus', 'id')],
             'title' => ['sometimes', 'string', 'max:120'],
+            'title_ar' => ['nullable', 'string', 'max:120'],
             'slug' => [
                 'sometimes',
                 'string',
