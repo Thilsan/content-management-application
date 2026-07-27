@@ -46,12 +46,17 @@ it('returns 404 for a draft page requested by slug', function (): void {
     $this->getJson("/api/public/pages/{$page->slug}")->assertNotFound();
 });
 
-it('shows a scheduled page only once its publish date has passed', function (): void {
+it('shows a scheduled page only once the scheduler has promoted it', function (): void {
     $page = Page::factory()->scheduled('+3 days')->create();
 
     $this->getJson("/api/public/pages/{$page->slug}")->assertNotFound();
 
     $this->travel(4)->days();
+
+    // The date passing is not enough on its own; the command owns the switch.
+    $this->getJson("/api/public/pages/{$page->slug}")->assertNotFound();
+
+    $this->artisan('pages:publish-due')->assertSuccessful();
 
     $this->getJson("/api/public/pages/{$page->slug}")
         ->assertOk()

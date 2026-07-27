@@ -124,7 +124,8 @@ What they cover:
 | `RolePrivilegeTest` | What a moderator may and may not do, including that a moderator cannot delete a page |
 | `PageManagementTest` | Pagination, search, filters, cover uploads, the audit trail, trash and restore |
 | `MenuTest` | Nested tree, reordering, circular-order rejection, deleting a branch that still holds pages |
-| `PublicContentTest` | Drafts and future dated pages hidden, a scheduled page appearing once its date passes |
+| `PublicContentTest` | Drafts and future dated pages hidden, a scheduled page appearing once promoted |
+| `ScheduledPublishingTest` | The Artisan command promoting, withdrawing, and leaving the audit trail alone |
 | `UserManagementTest` | User CRUD, password hashing, and refusing to delete your own account |
 | `RoleManagementTest` | Role and privilege CRUD, and re-granting privileges changing what a role may do |
 | `HelperTest`, `SlugHelperTest` | The custom helpers |
@@ -165,17 +166,40 @@ to read it.
 
 ## Scheduled publishing
 
-A page is visible to readers when it is published **and** its publish date has passed. That rule
-lives in one scope, `Page::scopeVisible()`, which every public endpoint applies:
+A page is visible to readers when it is published **and** its publish date has passed. Rather
+than evaluating that date on every request, the answer is stored on the row in `is_live`, and a
+scheduled Artisan command owns the transition:
+
+```bash
+php artisan pages:publish-due
+```
+
+It promotes anything now due, and withdraws anything pulled back to draft or pushed to a later
+date. Every public endpoint then filters on a single indexed boolean through
+`Page::scopeVisible()`:
 
 ```php
-$query->where('status', PageStatus::Published)
-    ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()));
+$query->where('is_live', true);
 ```
+
+The command is registered in `routes/console.php` to run every minute. To have it actually run:
+
+```bash
+php artisan schedule:work    # local, keeps running in the foreground
+```
+
+```
+* * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1    # a server
+```
+
+Under Docker the `scheduler` service does this for you, so nothing extra is needed.
+
+Saving a page still settles the flag immediately, so publishing something with no date is live
+at once rather than waiting for the next tick. Only *dated* pages wait for the scheduler.
 
 Leaving the publish date empty means "live as soon as it is published". A date in the future
 means the page sits in the back end marked **Scheduled** and 404s on the public site until the
-date passes.
+command promotes it.
 
 The seeded content includes both cases so the behaviour is visible immediately:
 
@@ -221,8 +245,10 @@ the trash. Deleting for good also removes the cover file from disk.
 - **Page bodies are rendered as HTML** on the public site. The markup comes from CKEditor and an
   authenticated editor, which is the trust boundary a CMS accepts by design.
 
-## Not included
+## Optional extras
 
-The optional extras in the brief — a mobile client, Arabic and RTL content, and driving scheduled
-publishing from a scheduled Artisan command instead of the query-time check — are not built. The
-publish rule is enforced at query time by the scope above, which needs no cron to be correct.
+Of the three bonus items in the brief:
+
+- **Artisan command** — done. `pages:publish-due`, scheduled every minute, described above.
+- **Mobile app** — not built yet.
+- **Arabic / RTL** — not built yet.

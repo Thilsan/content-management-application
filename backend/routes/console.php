@@ -1,8 +1,15 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+/*
+ * Scheduled publishing. A page dated in the future stays out of the public
+ * queries until this command promotes it, so the site does not depend on
+ * evaluating a publish date on every request.
+ *
+ * Locally:     php artisan schedule:work
+ * On a server: * * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1
+ */
+Schedule::command('pages:publish-due')
+    ->everyMinute()
+    ->withoutOverlapping();

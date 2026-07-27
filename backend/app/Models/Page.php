@@ -36,6 +36,7 @@ class Page extends Model
             'status' => PageStatus::class,
             'published_at' => 'datetime',
             'position' => 'integer',
+            'is_live' => 'boolean',
         ];
     }
 
@@ -49,6 +50,22 @@ class Page extends Model
         static::updating(function (self $page): void {
             $page->updated_by = auth()->id() ?? $page->updated_by;
         });
+
+        // Settle the flag whenever an editor saves, so publishing something with
+        // no date is live immediately rather than waiting for the next tick of
+        // the scheduler. Dated pages are left to pages:publish-due.
+        static::saving(function (self $page): void {
+            $page->is_live = $page->qualifiesAsLive();
+        });
+    }
+
+    /**
+     * Published, and either undated or dated in the past.
+     */
+    public function qualifiesAsLive(): bool
+    {
+        return $this->status === PageStatus::Published
+            && (is_null($this->published_at) || $this->published_at->isPast());
     }
 
     /**
@@ -76,22 +93,18 @@ class Page extends Model
     }
 
     /**
-     * Pages the public site is allowed to show: published, and either with no
-     * publish date or with one that has already passed.
+     * Pages the public site is allowed to show. The publish date is not
+     * evaluated here: the pages:publish-due command owns that transition and
+     * records the answer in is_live.
      */
     public function scopeVisible(Builder $query): void
     {
-        $query->where('status', PageStatus::Published)
-            ->where(function (Builder $query): void {
-                $query->whereNull('published_at')
-                    ->orWhere('published_at', '<=', now());
-            });
+        $query->where('is_live', true);
     }
 
     public function isVisible(): bool
     {
-        return $this->status === PageStatus::Published
-            && (is_null($this->published_at) || $this->published_at->isPast());
+        return (bool) $this->is_live;
     }
 
     public function coverImageUrl(): ?string

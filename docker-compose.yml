@@ -49,6 +49,30 @@ services:
     depends_on:
       - app
 
+  # Runs pages:publish-due every minute, so a page with a future publish date
+  # goes live on its own without anyone touching the site.
+  scheduler:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-cms}
+      DB_USERNAME: ${DB_USERNAME:-cms}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - ./backend:/var/www/html
+    entrypoint: ["php", "artisan", "schedule:work"]
+    depends_on:
+      app:
+        condition: service_started
+      db:
+        condition: service_healthy
+
   web:
     build:
       context: ./frontend

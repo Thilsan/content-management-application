@@ -38,6 +38,9 @@ if [ ! -f storage/.seeded ]; then
     touch storage/.seeded
 fi
 
+# Settle is_live for anything already in the database before the first request.
+php artisan pages:publish-due
+
 php artisan storage:link 2>/dev/null || true
 php artisan l5-swagger:generate
 
