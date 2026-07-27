@@ -17,6 +17,8 @@
   --color-surface: #ffffff;
   --color-canvas: #f7f8fa;
   --color-wash: #f2f4f7;
+  /* A shade deeper than the canvas so the admin rail reads as its own panel. */
+  --color-sidebar: #edf0f5;
 
   --color-accent: #2f6fed;
   --color-accent-strong: #1e4fbd;
@@ -68,6 +70,18 @@
   /* One focus treatment for everything that takes focus. */
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     @apply outline-none ring-[3px] ring-accent/20 rounded-field;
+  }
+
+  /* Jumping to a heading should not tuck it under the sticky header. */
+  :target,
+  .page-body :is(h2, h3) {
+    scroll-margin-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
 

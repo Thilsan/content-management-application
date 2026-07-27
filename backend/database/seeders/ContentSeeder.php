@@ -104,13 +104,26 @@ class ContentSeeder extends Seeder
                     <h2>A short history</h2>
                     <p>We started in 2014 with three people and a single product idea. Today we help
                     organisations across the region put their content in front of the people who need it.</p>
+                    <p>The first few years were spent almost entirely on one client. That turned out to be
+                    a good way to learn the business, and a poor way to build one, so we spent 2017
+                    deliberately widening the base.</p>
+                    <h2>How the work is organised</h2>
                     <p>Our work sits in three areas: strategy, delivery and long term support. Each one is
-                    handled by a small team that stays with a client from the first workshop onwards.</p>
+                    handled by a small team that stays with a client from the first workshop onwards, rather
+                    than handing the work down a chain of people who were not in the room.</p>
                     <ul>
                         <li>Offices in Colombo and Dubai</li>
                         <li>Forty two people across engineering, design and delivery</li>
                         <li>Clients in retail, logistics and public services</li>
                     </ul>
+                    <h2>What we care about</h2>
+                    <p>Two things, mostly. That the people doing the work talk to the people who asked for
+                    it, and that whatever we hand over can be maintained by someone who has never met us.</p>
+                    <blockquote><p>The best sign a project went well is that nobody needs to call us about
+                    it a year later.</p></blockquote>
+                    <h2>Getting in touch</h2>
+                    <p>Most conversations start with a short call and a look at what already exists. There
+                    is no charge for that, and no expectation of anything afterwards.</p>
                     HTML,
             ],
             [
@@ -124,8 +137,17 @@ class ContentSeeder extends Seeder
                     <h2>The people running things</h2>
                     <p>Our leadership team is deliberately small. Everyone still spends part of the week
                     on client work, which keeps the decisions close to the delivery.</p>
+                    <p>There are four of them, covering delivery, engineering, commercial and operations.
+                    Nobody carries a title longer than two words.</p>
+                    <h2>How decisions get made</h2>
                     <p>The team meets every Monday to review the roadmap and again on Thursday to look at
-                    anything that slipped. Notes from both meetings go out to the whole company.</p>
+                    anything that slipped. Notes from both meetings go out to the whole company the same
+                    afternoon, including the parts that did not go well.</p>
+                    <p>Anything that affects a client is decided with the delivery lead for that account in
+                    the room, not afterwards.</p>
+                    <h2>Talking to them</h2>
+                    <p>Every member of the team keeps two hours a week free for anyone in the company to
+                    book, no agenda required.</p>
                     HTML,
             ],
             [
@@ -144,7 +166,17 @@ class ContentSeeder extends Seeder
                         <li><strong>Frontend engineer</strong> &mdash; React and TypeScript, Colombo</li>
                         <li><strong>Delivery lead</strong> &mdash; Dubai</li>
                     </ul>
-                    <p>Every application gets a reply, usually within a week.</p>
+                    <h2>How the process runs</h2>
+                    <p>Three conversations, usually across two weeks. A call to work out whether the role
+                    is what you thought it was, a technical session built around the sort of work you would
+                    actually do, and a longer chat with the team you would join.</p>
+                    <p>There is no take home exercise that runs longer than an evening, and we pay for it
+                    if it does.</p>
+                    <h2>What we look for</h2>
+                    <p>People who can explain a decision they later regretted, and what they did about it.
+                    Almost everything else can be taught.</p>
+                    <h2>Applying</h2>
+                    <p>Every application gets a reply, usually within a week, whichever way it goes.</p>
                     HTML,
             ],
             [
@@ -158,6 +190,17 @@ class ContentSeeder extends Seeder
                     <h2>Our services</h2>
                     <p>We take on work in three shapes: a fixed scope build, a longer running delivery
                     team, or a short review of something that is already live.</p>
+                    <h2>Fixed scope builds</h2>
+                    <p>Best when the problem is well understood and the deadline matters more than the
+                    flexibility. We quote a price and a date, and both hold unless the scope changes in
+                    writing.</p>
+                    <h2>Delivery teams</h2>
+                    <p>A standing team of three to six people working to your roadmap. Most of our longer
+                    relationships look like this, and a few have run for years.</p>
+                    <h2>Reviews</h2>
+                    <p>A week or two spent reading the code, talking to the team and writing down what we
+                    found. Useful before a funding round, an acquisition, or a rebuild nobody is sure
+                    about yet.</p>
                     <p>Most engagements start with a two week discovery so both sides know what is being
                     signed up for before any code is written.</p>
                     HTML,
@@ -173,6 +216,15 @@ class ContentSeeder extends Seeder
                     <h2>Advisory</h2>
                     <p>Sometimes a team does not need more hands, it needs a second opinion. Our advisory
                     work covers architecture reviews, hiring plans and delivery audits.</p>
+                    <h2>Architecture reviews</h2>
+                    <p>Two people spend a week with your codebase and your engineers, then write up what
+                    is likely to break first and what it would cost to prevent. No slides.</p>
+                    <h2>Hiring plans</h2>
+                    <p>Working out what shape the team needs to be in twelve months, and in what order to
+                    hire so that each person has someone to learn from when they arrive.</p>
+                    <h2>Delivery audits</h2>
+                    <p>For when projects keep slipping and nobody can say exactly why. Usually the answer
+                    is in how work is estimated and handed over rather than in the engineering.</p>
                     <p>Engagements run from a single day workshop to a standing monthly review.</p>
                     HTML,
             ],
@@ -187,7 +239,16 @@ class ContentSeeder extends Seeder
                     <h2>Where things stand</h2>
                     <p>The first half of the year closed ahead of plan. Two new clients came on board and
                     the support team grew by four people.</p>
-                    <p>The next update goes out at the end of the quarter.</p>
+                    <h2>Delivery</h2>
+                    <p>Eleven releases went out, two of which slipped by a week. Both slips came from the
+                    same cause, a dependency on a third party sandbox that was down more than it was up,
+                    and we have moved that work behind a stub for the rest of the year.</p>
+                    <h2>The team</h2>
+                    <p>Four people joined support and one moved across from delivery. We are still looking
+                    for a second frontend engineer, which has been open longer than we would like.</p>
+                    <h2>What is next</h2>
+                    <p>The next update goes out at the end of the quarter, with the annual report following
+                    in the new year.</p>
                     HTML,
             ],
             [
