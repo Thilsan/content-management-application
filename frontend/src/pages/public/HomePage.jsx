@@ -11,32 +11,35 @@ function toSections(items) {
   ])
 }
 
-function Card({ page }) {
+/*
+ * Rows rather than cards. A section here often holds a single page, and one
+ * card in a grid leaves an obvious hole next to it; a list reads correctly
+ * whether the section has one page or twenty.
+ */
+function Row({ page }) {
   return (
     <Link
       to={`/pages/${page.slug}`}
-      className="group flex flex-col rounded-card border border-line bg-surface p-5 shadow-card transition duration-150 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lift"
+      className="group flex items-start gap-5 px-5 py-4 transition-colors hover:bg-[#fbfcfd]"
     >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-4">
+          <h3 className="text-[1.02rem] text-ink group-hover:text-accent-strong">{page.title}</h3>
+          <span className="shrink-0 text-[0.78rem] whitespace-nowrap text-muted">
+            {formatDate(page.published_at)}
+          </span>
+        </div>
+
+        <p className="mt-1 line-clamp-2 text-[0.89rem] text-ink-soft">{page.excerpt}</p>
+      </div>
+
       {page.cover_image_url && (
         <img
-          className="mb-4 h-36 w-full rounded-panel border border-line object-cover"
+          className="hidden h-16 w-24 flex-none rounded-panel border border-line object-cover sm:block"
           src={page.cover_image_url}
           alt=""
         />
       )}
-
-      <h3 className="text-[1.05rem] leading-snug text-ink group-hover:text-accent-strong">
-        {page.title}
-      </h3>
-
-      <p className="mt-2 line-clamp-3 flex-1 text-[0.89rem] text-ink-soft">{page.excerpt}</p>
-
-      <div className="mt-4 flex items-center justify-between border-t border-line pt-3 text-[0.78rem] text-muted">
-        <span>{formatDate(page.published_at) ?? 'Undated'}</span>
-        <span className="font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
-          Read →
-        </span>
-      </div>
     </Link>
   )
 }
@@ -66,8 +69,7 @@ export default function HomePage() {
         ...section,
         pages: section.pages.filter(
           (page) =>
-            page.title.toLowerCase().includes(term) ||
-            page.excerpt.toLowerCase().includes(term),
+            page.title.toLowerCase().includes(term) || page.excerpt.toLowerCase().includes(term),
         ),
       }))
       .filter((section) => section.pages.length > 0)
@@ -91,11 +93,11 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="mb-9">
+      <div className="mb-8 max-w-185">
         <h1 className="text-[2.1rem] tracking-[-0.03em]">Published pages</h1>
         <p className="lede text-[0.98rem]">
           {total} {total === 1 ? 'page' : 'pages'} across {sections.length}{' '}
-          {sections.length === 1 ? 'section' : 'sections'}, grouped the way the menu is ordered.
+          {sections.length === 1 ? 'section' : 'sections'}, in the order the menu sets.
         </p>
 
         <div className="relative mt-5 max-w-md">
@@ -139,23 +141,24 @@ export default function HomePage() {
           </EmptyState>
         </div>
       ) : (
-        results.map((section) => (
-          <section key={section.id} className="mt-9 first:mt-0">
-            <div className="mb-4 flex items-baseline gap-3">
-              <h2 className="text-[1.15rem]">{section.title}</h2>
-              <span className="text-[0.78rem] text-muted">
-                {section.pages.length} {section.pages.length === 1 ? 'page' : 'pages'}
-              </span>
-              <span className="h-px flex-1 bg-line" />
-            </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {results.map((section) => (
+            <section key={section.id}>
+              <div className="mb-2.5 flex items-baseline gap-3 px-1">
+                <h2 className="text-[1.05rem]">{section.title}</h2>
+                <span className="text-[0.78rem] text-muted">
+                  {section.pages.length} {section.pages.length === 1 ? 'page' : 'pages'}
+                </span>
+              </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              {section.pages.map((page) => (
-                <Card key={page.id} page={page} />
-              ))}
-            </div>
-          </section>
-        ))
+              <div className="card divide-y divide-line overflow-hidden p-0">
+                {section.pages.map((page) => (
+                  <Row key={page.id} page={page} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       )}
     </>
   )

@@ -49,7 +49,7 @@ export default function PageView() {
 
   if (error) {
     return (
-      <div className="card max-w-185">
+      <div className="card mx-auto max-w-185">
         <EmptyState title="Not available">
           {error}
           <p className="mt-4">
@@ -61,7 +61,7 @@ export default function PageView() {
   }
 
   return (
-    <div className="max-w-185">
+    <div className="mx-auto max-w-185">
       <article>
         <p className="mb-3 text-[0.8rem] text-muted">
           <Link to="/" className="text-muted hover:text-ink">
