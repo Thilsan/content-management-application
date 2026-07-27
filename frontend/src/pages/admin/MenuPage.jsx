@@ -119,7 +119,7 @@ export default function MenuPage() {
   return (
     <>
       <PageHeader
-        overline="Structure"
+        eyebrow="Structure"
         title="Menu"
         lede="Drag a heading to move it, and use the arrows to nest it under the one above. Moving a heading takes its children with it. The public site follows this order."
       >

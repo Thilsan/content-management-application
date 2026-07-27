@@ -139,7 +139,7 @@ export default function PageFormPage() {
 
   return (
     <>
-      <PageHeader overline={editing ? 'Editing' : 'New'} title={editing ? 'Edit page' : 'Add page'}>
+      <PageHeader eyebrow={editing ? 'Editing' : 'New'} title={editing ? 'Edit page' : 'Add page'}>
         <Link to="/admin/pages" className="btn">
           Back to pages
         </Link>

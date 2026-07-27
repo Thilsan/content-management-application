@@ -81,7 +81,7 @@
     @apply bg-surface border border-line rounded-card shadow-card;
   }
 
-  .overline {
+  .eyebrow {
     @apply text-[0.7rem] font-semibold uppercase tracking-[0.09em] text-muted;
   }
 

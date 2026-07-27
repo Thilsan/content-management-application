@@ -110,7 +110,7 @@ export default function UserListPage() {
   return (
     <>
       <PageHeader
-        overline="Access"
+        eyebrow="Access"
         title="Users"
         lede="A user may hold several roles. What they can actually do is the union of the privileges those roles grant."
       >
@@ -178,7 +178,7 @@ export default function UserListPage() {
           </div>
 
           <div className="mb-4">
-            <span className="overline mb-2 block">Roles</span>
+            <span className="eyebrow mb-2 block">Roles</span>
             {roles.length === 0 ? (
               <p className="hint">No roles to choose from.</p>
             ) : (

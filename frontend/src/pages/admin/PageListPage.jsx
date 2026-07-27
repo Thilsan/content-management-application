@@ -69,7 +69,7 @@ export default function PageListPage() {
   return (
     <>
       <PageHeader
-        overline="Content"
+        eyebrow="Content"
         title="Pages"
         lede="Every page including drafts and anything scheduled for a later date."
       >

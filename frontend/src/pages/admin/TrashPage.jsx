@@ -55,7 +55,7 @@ export default function TrashPage() {
   return (
     <>
       <PageHeader
-        overline="Content"
+        eyebrow="Content"
         title="Trash"
         lede="Deleted pages are kept here. Restoring one puts it back exactly as it was, cover image included."
       />

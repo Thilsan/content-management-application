@@ -112,7 +112,7 @@ export default function PageView() {
             >
               <PageThumb page={previous} className="size-10 flex-none text-[0.95rem]" />
               <span className="min-w-0">
-                <span className="overline">Previous</span>
+                <span className="eyebrow">Previous</span>
                 <span className="mt-0.5 block truncate text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
                   {previous.title}
                 </span>
@@ -128,7 +128,7 @@ export default function PageView() {
               className="group flex items-center justify-end gap-3 rounded-card border border-line bg-surface p-4 shadow-card transition hover:border-accent/40 hover:shadow-lift"
             >
               <span className="min-w-0 text-right">
-                <span className="overline">Next</span>
+                <span className="eyebrow">Next</span>
                 <span className="mt-0.5 block truncate text-[0.95rem] font-medium text-ink group-hover:text-accent-strong">
                   {next.title}
                 </span>

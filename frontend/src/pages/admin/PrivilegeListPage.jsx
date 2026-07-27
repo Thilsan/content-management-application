@@ -71,7 +71,7 @@ export default function PrivilegeListPage() {
   return (
     <>
       <PageHeader
-        overline="Access"
+        eyebrow="Access"
         title="Privileges"
         lede="Each name here doubles as the check the API performs, so a new privilege becomes enforceable the moment a role grants it. Names read as group.action."
       >

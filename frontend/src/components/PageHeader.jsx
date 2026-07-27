@@ -2,11 +2,11 @@
  * Overline, title, one line of explanation, and an optional action on the right.
  * Shared so every screen in the back office opens the same way.
  */
-export default function PageHeader({ overline, title, lede, children }) {
+export default function PageHeader({ eyebrow, title, lede, children }) {
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-5">
       <div>
-        {overline && <p className="overline">{overline}</p>}
+        {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h1 className="text-2xl">{title}</h1>
         {lede && <p className="lede">{lede}</p>}
       </div>

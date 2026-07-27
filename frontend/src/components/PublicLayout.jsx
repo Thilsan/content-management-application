@@ -47,25 +47,47 @@ function MenuLink({ page, onNavigate }) {
   )
 }
 
-/** A nested section inside the dropdown, with its own pages beneath it. */
-function MenuGroup({ item, onNavigate }) {
+/** One column of the dropdown: a section heading with its pages beneath it. */
+function MenuColumn({ section, onNavigate }) {
   return (
-    <>
-      <p className="overline px-2 pt-3 pb-1">{item.title}</p>
+    <div className="min-w-0">
+      <p className="eyebrow px-2 pb-1.5">{section.title}</p>
 
-      {item.pages.map((page) => (
+      {section.pages.map((page) => (
         <MenuLink key={page.id} page={page} onNavigate={onNavigate} />
       ))}
 
-      {item.children.map((child) => (
-        <MenuGroup key={child.id} item={child} onNavigate={onNavigate} />
+      {/* Anything nested deeper is flattened under its own sub heading; a menu
+          that needs more than three levels needs rethinking, not more code. */}
+      {section.children.map((child) => (
+        <div key={child.id} className="mt-3">
+          <p className="px-2 pb-1 text-[0.78rem] font-medium text-ink">{child.title}</p>
+
+          {branchPages(child).map((page) => (
+            <MenuLink key={page.id} page={page} onNavigate={onNavigate} />
+          ))}
+        </div>
       ))}
-    </>
+    </div>
   )
+}
+
+/**
+ * The item's own pages form the first column, then each child section gets one
+ * of its own, so the whole branch is visible at a glance instead of stacked.
+ */
+function columnsFor(item) {
+  return [
+    ...(item.pages.length > 0
+      ? [{ id: `self-${item.id}`, title: item.title, pages: item.pages, children: [] }]
+      : []),
+    ...item.children,
+  ]
 }
 
 function NavItem({ item, open, onOpen, onClose, onToggle }) {
   const pages = branchPages(item)
+  const columns = columnsFor(item)
   const buttonRef = useRef(null)
   const panelRef = useRef(null)
 
@@ -160,14 +182,21 @@ function NavItem({ item, open, onOpen, onClose, onToggle }) {
       </button>
 
       {open && (
-        <div ref={panelRef} role="menu" onKeyDown={handlePanelKey} className="menu-panel">
-          {item.pages.map((page) => (
-            <MenuLink key={page.id} page={page} onNavigate={onClose} />
-          ))}
-
-          {item.children.map((child) => (
-            <MenuGroup key={child.id} item={child} onNavigate={onClose} />
-          ))}
+        <div
+          ref={panelRef}
+          role="menu"
+          onKeyDown={handlePanelKey}
+          className="menu-panel p-3"
+          style={{ width: `min(${columns.length * 15}rem, calc(100vw - 3rem))` }}
+        >
+          <div
+            className="grid gap-x-3 gap-y-4"
+            style={{ gridTemplateColumns: `repeat(${Math.min(columns.length, 3)}, minmax(0, 1fr))` }}
+          >
+            {columns.map((section) => (
+              <MenuColumn key={section.id} section={section} onNavigate={onClose} />
+            ))}
+          </div>
         </div>
       )}
     </div>

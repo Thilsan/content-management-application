@@ -90,7 +90,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-5 rounded-panel border border-line bg-wash px-3.5 py-3 text-[0.82rem] leading-7 text-ink-soft">
-            <span className="overline mb-1 block">Seeded accounts</span>
+            <span className="eyebrow mb-1 block">Seeded accounts</span>
             <code className="code">admin@cms.test</code> — full access
             <br />
             <code className="code">moderator@cms.test</code> — pages only

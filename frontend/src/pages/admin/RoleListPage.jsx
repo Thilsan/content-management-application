@@ -112,7 +112,7 @@ export default function RoleListPage() {
   return (
     <>
       <PageHeader
-        overline="Access"
+        eyebrow="Access"
         title="Roles"
         lede="A role is a bundle of privileges. The API checks the privilege, never the role name, so what a role may do is entirely a matter of which boxes are ticked here."
       >
@@ -168,7 +168,7 @@ export default function RoleListPage() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {grouped.map(([group, items]) => (
                   <div key={group}>
-                    <span className="overline mb-2 block">{group}</span>
+                    <span className="eyebrow mb-2 block">{group}</span>
                     {items.map((privilege) => (
                       <label key={privilege.id} className="checkbox">
                         <input
