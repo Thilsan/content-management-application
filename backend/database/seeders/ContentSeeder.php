@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ContentSeeder extends Seeder
 {
-    /** Slugs that get a real stored cover image rather than the frontend's generated tile. */
-    private const COVERED_SLUGS = ['who-we-are', 'company-update'];
+    /** Real photos live here, one file per slug, checked in against the repo. */
+    private const ASSET_DIRECTORY = __DIR__.'/assets/covers';
+
+    private const ASSET_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
 
     public function run(): void
     {
@@ -22,12 +24,7 @@ class ContentSeeder extends Seeder
 
         foreach ($this->pages() as $data) {
             $menu = Menu::where('slug', $data['menu'])->firstOrFail();
-            $coverImage = null;
-
-            if (in_array($data['slug'], self::COVERED_SLUGS, true)) {
-                $coverImage = "covers/{$data['slug']}.jpg";
-                $this->seedCoverImage($coverImage, $data['slug']);
-            }
+            $coverImage = $this->coverImageFor($data['slug']);
 
             Page::withTrashed()
                 ->firstOrNew(['slug' => $data['slug']])
@@ -49,10 +46,35 @@ class ContentSeeder extends Seeder
     }
 
     /**
-     * A couple of demo pages get a generated cover image stored on the public
-     * disk, the same way an uploaded one lands, so the feature is actually
-     * exercised on a clean seed rather than only ever tested by hand.
+     * A real photo checked into the repo for this slug, stored on the public
+     * disk the same way an upload would land. Falls back to a generated
+     * gradient so the feature is still exercised for a page nobody supplied
+     * a photo for.
      */
+    private function coverImageFor(string $slug): ?string
+    {
+        foreach (self::ASSET_EXTENSIONS as $extension) {
+            $asset = self::ASSET_DIRECTORY."/{$slug}.{$extension}";
+
+            if (! is_file($asset)) {
+                continue;
+            }
+
+            $path = "covers/{$slug}.{$extension}";
+
+            if (! Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->put($path, file_get_contents($asset));
+            }
+
+            return $path;
+        }
+
+        $path = "covers/{$slug}.jpg";
+        $this->seedCoverImage($path, $slug);
+
+        return $path;
+    }
+
     private function seedCoverImage(string $path, string $seed): void
     {
         if (Storage::disk('public')->exists($path)) {
