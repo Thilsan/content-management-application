@@ -1,8 +1,8 @@
 # Content Management Application
 
-Laravel Developer take-home assignment. A CMS backend (users, roles, privileges, pages, a
-sortable/nestable menu) with a React frontend and a Flutter mobile client, all talking to the
-same API.
+This is my submission for the Laravel Developer take-home assignment. A CMS backend (users,
+roles, privileges, pages, a sortable/nestable menu) with a React frontend and a Flutter mobile
+client, all talking to the same API.
 
 Stack:
 - **Backend:** PHP 8.2+, Laravel 12, MySQL, Sanctum, l5-swagger
