@@ -1,8 +1,8 @@
 # Content Management Application
 
-Built this for a Laravel Developer assignment. It's a CMS: users, roles and privileges, dynamic
-pages under a sortable/nestable menu, a React frontend, and a Flutter mobile client, all talking
-to one API.
+A content management system with a Laravel API, a React front end, and a Flutter mobile client.
+Users, roles and privileges, dynamic pages under a sortable and nestable menu, and permission
+checks enforced on every endpoint, not just hidden in the UI.
 
 Stack:
 - **Backend:** PHP 8.2+, Laravel 12, MySQL, Sanctum, l5-swagger
