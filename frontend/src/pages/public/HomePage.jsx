@@ -24,15 +24,19 @@ function Row({ page }) {
   return (
     <Link
       to={`/pages/${page.slug}`}
-      className="group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-[#fbfcfd]"
+      className="group flex items-start gap-4 px-5 py-4 transition-colors hover:bg-neutral-50"
     >
       <PageThumb page={page} className="size-11 flex-none text-[1.05rem]" />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-4">
-          <h3 className="flex items-center gap-2 text-[1.02rem] text-ink group-hover:text-accent-strong">
+          <h3 className="flex items-center gap-2 text-[1.02rem] text-ink group-hover:text-black group-hover:underline">
             {page.title}
-            {isRecent(page.published_at) && <span className="tag tag-scheduled">New</span>}
+            {isRecent(page.published_at) && (
+              <span className="rounded-full border border-black px-2 py-0.5 text-[0.68rem] font-semibold text-black">
+                New
+              </span>
+            )}
           </h3>
           <span className="shrink-0 text-[0.78rem] whitespace-nowrap text-muted">
             {formatDate(page.published_at)}
@@ -114,7 +118,7 @@ export default function HomePage() {
 
           <input
             type="search"
-            className="input ps-9"
+            className="w-full rounded-lg border border-neutral-300 py-2 ps-9 pe-3 text-[0.92rem] text-black transition-colors placeholder:text-neutral-400 hover:border-neutral-400 focus:border-black focus:ring-3 focus:ring-black/10 focus:outline-none"
             placeholder={t.searchPages}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -133,7 +137,7 @@ export default function HomePage() {
         <div className="card">
           <EmptyState title={t.noMatches}>
             {t.tryShorter}{' '}
-            <button type="button" className="text-accent underline" onClick={() => setQuery('')}>
+            <button type="button" className="text-black underline" onClick={() => setQuery('')}>
               {t.clearSearch}
             </button>
           </EmptyState>

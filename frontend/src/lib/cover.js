@@ -15,10 +15,13 @@ function hueFrom(seed) {
 }
 
 export function coverStyle(seed) {
-  const hue = hueFrom(seed ?? '')
+  // Grayscale rather than hue-based: the point is a stable identity per page,
+  // not a colourful one. Lightness kept dark enough that the white initial
+  // stays legible.
+  const lightness = 16 + (hueFrom(seed ?? '') % 22)
 
   return {
-    backgroundImage: `linear-gradient(135deg, hsl(${hue} 58% 60%), hsl(${(hue + 42) % 360} 62% 47%))`,
+    backgroundImage: `linear-gradient(135deg, hsl(0 0% ${lightness}%), hsl(0 0% ${lightness + 9}%))`,
   }
 }
 

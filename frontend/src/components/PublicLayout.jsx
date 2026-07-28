@@ -38,7 +38,7 @@ function MenuLink({ page, onNavigate }) {
       onClick={onNavigate}
       className={({ isActive }) =>
         isActive
-          ? 'menu-item bg-accent-wash font-medium text-accent-strong'
+          ? 'menu-item bg-neutral-100 font-medium text-black'
           : 'menu-item text-ink-soft hover:bg-wash hover:text-ink'
       }
     >
@@ -101,7 +101,7 @@ function NavItem({ item, open, onOpen, onClose, onToggle }) {
         onClick={onClose}
         className={({ isActive }) =>
           isActive
-            ? `${TAB} bg-accent-wash text-accent-strong`
+            ? `${TAB} bg-neutral-100 text-black`
             : `${TAB} text-ink-soft hover:bg-wash hover:text-ink`
         }
       >
@@ -219,7 +219,7 @@ function LanguageSwitch() {
           lang={code}
           className={
             code === locale
-              ? 'rounded px-2 py-0.5 text-[0.78rem] font-semibold bg-accent text-white shadow-none'
+              ? 'rounded px-2 py-0.5 text-[0.78rem] font-semibold bg-black text-white shadow-none'
               : 'rounded px-2 py-0.5 text-[0.78rem] font-medium text-ink-soft hover:bg-wash hover:text-ink'
           }
         >
@@ -277,7 +277,7 @@ export default function PublicLayout() {
             to="/"
             className="flex items-center gap-2 text-[0.95rem] font-semibold tracking-tight whitespace-nowrap text-ink hover:text-ink"
           >
-            <span className="grid size-6 place-items-center rounded-[7px] bg-linear-to-br from-accent to-[#6d4bf0] text-[0.72rem] font-bold text-white">
+            <span className="grid size-6 place-items-center rounded-[7px] bg-black text-[0.72rem] font-bold text-white">
               CM
             </span>
             Content
