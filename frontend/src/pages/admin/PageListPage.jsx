@@ -8,6 +8,9 @@ import StatusTag from '../../components/StatusTag.jsx'
 import { api } from '../../lib/api'
 import { flattenTree } from '../../lib/tree'
 
+const FIELD =
+  'w-full rounded-lg border border-neutral-300 px-3 py-2 text-[0.9rem] text-black transition-colors placeholder:text-neutral-400 hover:border-neutral-400 focus:border-black focus:ring-3 focus:ring-black/10 focus:outline-none'
+
 export default function PageListPage() {
   const { can } = useAuth()
   const location = useLocation()
@@ -74,24 +77,35 @@ export default function PageListPage() {
         lede="Every page including drafts and anything scheduled for a later date."
       >
         {can('pages.create') && (
-          <Link to="/admin/pages/new" className="btn btn-primary">
+          <Link
+            to="/admin/pages/new"
+            className="rounded-lg bg-black px-4 py-2 text-[0.88rem] font-medium text-white transition-colors hover:bg-neutral-800"
+          >
             Add page
           </Link>
         )}
       </PageHeader>
 
-      {error && <p className="notice notice-error">{error}</p>}
-      {notice && <p className="notice notice-success">{notice}</p>}
+      {error && (
+        <p className="mb-4 rounded-lg border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-[0.89rem] text-red-600">
+          {error}
+        </p>
+      )}
+      {notice && (
+        <p className="mb-4 rounded-lg border border-neutral-200 bg-neutral-50 px-3.5 py-2.5 text-[0.89rem] text-black">
+          {notice}
+        </p>
+      )}
 
-      <div className="card mb-4 p-5">
+      <div className="mb-4 rounded-xl border border-neutral-200 p-5">
         <div className="flex flex-wrap items-end gap-4">
           <div className="min-w-45 flex-1">
-            <label className="label" htmlFor="search">
+            <label className="mb-1.5 block text-[0.83rem] font-medium text-black" htmlFor="search">
               Search by title
             </label>
             <input
               id="search"
-              className="input"
+              className={FIELD}
               type="search"
               value={search}
               placeholder="report"
@@ -103,12 +117,12 @@ export default function PageListPage() {
           </div>
 
           <div className="min-w-45 flex-1">
-            <label className="label" htmlFor="menu">
+            <label className="mb-1.5 block text-[0.83rem] font-medium text-black" htmlFor="menu">
               Menu
             </label>
             <select
               id="menu"
-              className="input"
+              className={FIELD}
               value={menuId}
               onChange={(event) => {
                 setPage(1)
@@ -126,12 +140,12 @@ export default function PageListPage() {
           </div>
 
           <div className="min-w-45 flex-1">
-            <label className="label" htmlFor="status">
+            <label className="mb-1.5 block text-[0.83rem] font-medium text-black" htmlFor="status">
               Status
             </label>
             <select
               id="status"
-              className="input"
+              className={FIELD}
               value={status}
               onChange={(event) => {
                 setPage(1)
@@ -146,7 +160,7 @@ export default function PageListPage() {
         </div>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-neutral-200">
         {loading ? (
           <EmptyState>Loading…</EmptyState>
         ) : pages.length === 0 ? (
@@ -155,29 +169,44 @@ export default function PageListPage() {
           </EmptyState>
         ) : (
           <div className="overflow-x-auto">
-            <table className="data-table">
+            <table className="w-full border-collapse text-[0.9rem]">
               <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Menu</th>
-                  <th>Status</th>
-                  <th>Publish date</th>
-                  <th>Last edited by</th>
-                  <th className="text-right" />
+                <tr className="border-b border-neutral-200 bg-neutral-50">
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-semibold tracking-[0.08em] text-neutral-500 uppercase">
+                    Title
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-semibold tracking-[0.08em] text-neutral-500 uppercase">
+                    Menu
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-semibold tracking-[0.08em] text-neutral-500 uppercase">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-semibold tracking-[0.08em] text-neutral-500 uppercase">
+                    Publish date
+                  </th>
+                  <th className="px-4 py-3 text-left text-[0.7rem] font-semibold tracking-[0.08em] text-neutral-500 uppercase">
+                    Last edited by
+                  </th>
+                  <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody>
                 {pages.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <strong className="font-medium">{row.title}</strong>
-                      <span className="sub">/{row.slug}</span>
+                  <tr
+                    key={row.id}
+                    className="border-b border-neutral-100 last:border-b-0 hover:bg-neutral-50"
+                  >
+                    <td className="px-4 py-3.5">
+                      <strong className="font-medium text-black">{row.title}</strong>
+                      <span className="mt-0.5 block text-[0.79rem] text-neutral-400">
+                        /{row.slug}
+                      </span>
                     </td>
-                    <td>{row.menu?.title ?? '—'}</td>
-                    <td>
+                    <td className="px-4 py-3.5 text-neutral-700">{row.menu?.title ?? '—'}</td>
+                    <td className="px-4 py-3.5">
                       <StatusTag page={row} />
                     </td>
-                    <td>
+                    <td className="px-4 py-3.5 text-neutral-700">
                       {row.published_at ? (
                         new Date(row.published_at).toLocaleDateString(undefined, {
                           day: 'numeric',
@@ -185,22 +214,25 @@ export default function PageListPage() {
                           year: 'numeric',
                         })
                       ) : (
-                        <span className="text-muted">Immediate</span>
+                        <span className="text-neutral-400">Immediate</span>
                       )}
                     </td>
-                    <td>{row.updated_by?.name ?? '—'}</td>
-                    <td className="text-right">
+                    <td className="px-4 py-3.5 text-neutral-700">{row.updated_by?.name ?? '—'}</td>
+                    <td className="px-4 py-3.5 text-right">
                       <div className="flex flex-wrap items-center justify-end gap-1.5">
                         {can('pages.update') && (
-                          <Link to={`/admin/pages/${row.id}/edit`} className="btn btn-tiny">
+                          <Link
+                            to={`/admin/pages/${row.id}/edit`}
+                            className="rounded-md border border-neutral-300 px-2.5 py-1 text-[0.8rem] font-medium text-black transition-colors hover:bg-neutral-100"
+                          >
                             Edit
                           </Link>
                         )}
                         {can('pages.delete') && (
                           <button
                             type="button"
-                            className="btn btn-tiny btn-danger"
                             onClick={() => handleDelete(row)}
+                            className="rounded-md border border-transparent px-2.5 py-1 text-[0.8rem] font-medium text-red-600 transition-colors hover:bg-red-50"
                           >
                             Delete
                           </button>
@@ -215,7 +247,7 @@ export default function PageListPage() {
         )}
 
         {meta && meta.last_page > 1 && (
-          <div className="px-5 pb-4">
+          <div className="border-t border-neutral-200 px-5 py-4">
             <Pagination meta={meta} onChange={setPage} />
           </div>
         )}
