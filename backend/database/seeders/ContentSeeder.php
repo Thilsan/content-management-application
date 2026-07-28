@@ -7,9 +7,13 @@ use App\Models\Menu;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class ContentSeeder extends Seeder
 {
+    /** Slugs that get a real stored cover image rather than the frontend's generated tile. */
+    private const COVERED_SLUGS = ['who-we-are', 'company-update'];
+
     public function run(): void
     {
         $this->createMenus($this->menuTree(), null);
@@ -18,6 +22,12 @@ class ContentSeeder extends Seeder
 
         foreach ($this->pages() as $data) {
             $menu = Menu::where('slug', $data['menu'])->firstOrFail();
+            $coverImage = null;
+
+            if (in_array($data['slug'], self::COVERED_SLUGS, true)) {
+                $coverImage = "covers/{$data['slug']}.jpg";
+                $this->seedCoverImage($coverImage, $data['slug']);
+            }
 
             Page::withTrashed()
                 ->firstOrNew(['slug' => $data['slug']])
@@ -27,6 +37,7 @@ class ContentSeeder extends Seeder
                     'title_ar' => $data['title_ar'] ?? null,
                     'body' => $data['body'],
                     'body_ar' => $data['body_ar'] ?? null,
+                    'cover_image' => $coverImage,
                     'status' => $data['status'],
                     'published_at' => $data['published_at'],
                     'position' => $data['position'],
@@ -35,6 +46,35 @@ class ContentSeeder extends Seeder
                 ])
                 ->save();
         }
+    }
+
+    /**
+     * A couple of demo pages get a generated cover image stored on the public
+     * disk, the same way an uploaded one lands, so the feature is actually
+     * exercised on a clean seed rather than only ever tested by hand.
+     */
+    private function seedCoverImage(string $path, string $seed): void
+    {
+        if (Storage::disk('public')->exists($path)) {
+            return;
+        }
+
+        $width = 1200;
+        $height = 630;
+        $image = imagecreatetruecolor($width, $height);
+        $dark = 24 + (crc32($seed) % 20);
+
+        for ($y = 0; $y < $height; $y++) {
+            $tone = (int) round($dark + (150 - $dark) * ($y / ($height - 1)));
+            imageline($image, 0, $y, $width, $y, imagecolorallocate($image, $tone, $tone, $tone));
+        }
+
+        ob_start();
+        imagejpeg($image, quality: 85);
+        $contents = ob_get_clean();
+        imagedestroy($image);
+
+        Storage::disk('public')->put($path, $contents);
     }
 
     /**
