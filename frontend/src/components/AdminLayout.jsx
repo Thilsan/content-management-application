@@ -74,12 +74,12 @@ export default function AdminLayout() {
         A rail on large screens; on anything narrower it collapses to a strip
         across the top with the same links scrolling horizontally.
       */}
-      <aside className="flex flex-col gap-3 border-b border-line bg-sidebar px-3 py-3 lg:sticky lg:top-0 lg:h-screen lg:gap-0 lg:border-r lg:border-b-0 lg:px-3 lg:py-4">
+      <aside className="flex flex-col gap-3 border-b border-white/10 bg-black px-3 py-3 lg:sticky lg:top-0 lg:h-screen lg:gap-0 lg:border-r lg:border-b-0 lg:px-3 lg:py-4">
         <Link
           to="/admin/pages"
-          className="flex items-center gap-2 px-1.5 text-[0.95rem] font-semibold tracking-tight text-ink hover:text-ink lg:mb-5"
+          className="flex items-center gap-2 px-1.5 text-[0.95rem] font-semibold tracking-tight text-white hover:text-white lg:mb-5"
         >
-          <span className="grid size-6 place-items-center rounded-[7px] bg-linear-to-br from-accent to-[#6d4bf0] text-[0.72rem] font-bold text-white">
+          <span className="grid size-6 place-items-center rounded-[7px] bg-white text-[0.72rem] font-bold text-black">
             CM
           </span>
           Admin
@@ -92,8 +92,8 @@ export default function AdminLayout() {
               to={section.to}
               className={({ isActive }) =>
                 isActive
-                  ? `${NAV} bg-surface text-ink shadow-card`
-                  : `${NAV} text-ink-soft hover:bg-surface/70 hover:text-ink`
+                  ? `${NAV} bg-white text-black shadow-lift`
+                  : `${NAV} text-white/60 hover:bg-white/10 hover:text-white`
               }
             >
               <Icon paths={ICONS[section.icon]} />
@@ -105,43 +105,51 @@ export default function AdminLayout() {
         <div className="hidden lg:block">
           <Link
             to="/"
-            className={`${NAV} text-ink-soft hover:bg-surface/70 hover:text-ink`}
+            className={`${NAV} text-white/60 hover:bg-white/10 hover:text-white`}
             title="Open the public site"
           >
             <Icon paths={['M8 1.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 8 1.8z', 'M1.8 8h12.4', 'M8 1.8c1.6 1.7 2.5 3.9 2.5 6.2S9.6 12.5 8 14.2C6.4 12.5 5.5 10.3 5.5 8S6.4 3.5 8 1.8z']} />
             View site
           </Link>
 
-          <div className="mt-3 flex items-center gap-2 border-t border-line-strong/60 pt-3">
-            <span className="grid size-7 flex-none place-items-center rounded-full border border-line-strong bg-surface text-[0.7rem] font-semibold text-ink-soft">
+          <div className="mt-3 flex items-center gap-2 border-t border-white/10 pt-3">
+            <span className="grid size-7 flex-none place-items-center rounded-full border border-white/15 bg-white/10 text-[0.7rem] font-semibold text-white">
               {initials(user.name)}
             </span>
             <span className="min-w-0 flex-1 leading-tight">
-              <span className="block truncate text-[0.85rem] font-medium">{user.name}</span>
-              <span className="block truncate text-[0.72rem] text-muted">
+              <span className="block truncate text-[0.85rem] font-medium text-white">{user.name}</span>
+              <span className="block truncate text-[0.72rem] text-white/50">
                 {user.roles.map((role) => role.name).join(', ') || 'No role'}
               </span>
             </span>
           </div>
 
-          <button type="button" className="btn btn-tiny mt-2 w-full justify-center" onClick={signOut}>
+          <button
+            type="button"
+            className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-field border border-white/15 bg-white/5 px-2 py-1 text-[0.8rem] font-medium text-white transition-colors hover:bg-white/10"
+            onClick={signOut}
+          >
             Sign out
           </button>
         </div>
 
         {/* The same controls, inline, while the rail is collapsed. */}
         <div className="flex items-center gap-2 lg:hidden">
-          <Link to="/" className="text-[0.85rem] font-medium text-ink-soft hover:text-ink">
+          <Link to="/" className="text-[0.85rem] font-medium text-white/60 hover:text-white">
             View site
           </Link>
-          <span className="ml-auto text-[0.8rem] text-muted">{user.name}</span>
-          <button type="button" className="btn btn-tiny" onClick={signOut}>
+          <span className="ml-auto text-[0.8rem] text-white/50">{user.name}</span>
+          <button
+            type="button"
+            className="rounded-field border border-white/15 bg-white/5 px-2 py-0.5 text-[0.8rem] font-medium text-white transition-colors hover:bg-white/10"
+            onClick={signOut}
+          >
             Sign out
           </button>
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-260 px-6 pt-8 pb-16">
+      <main className="w-full px-6 pt-8 pb-16">
         <Outlet />
       </main>
     </div>

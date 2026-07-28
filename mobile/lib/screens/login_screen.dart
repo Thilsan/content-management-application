@@ -95,11 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 52,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.accent, Color(0xFF6D4BF0)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: AppColors.ink,
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: const Text(
@@ -141,17 +137,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 11,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFDF2F1),
+                        color: AppColors.canvas,
                         borderRadius: BorderRadius.circular(10),
-                        border: const Border(
-                          left: BorderSide(color: Color(0xFFC0392F), width: 3),
-                        ),
+                        border: Border.all(color: AppColors.line),
                       ),
                       child: Text(
                         _message!,
                         style: const TextStyle(
                           fontSize: 13.5,
-                          color: Color(0xFFC0392F),
+                          color: AppColors.danger,
                         ),
                       ),
                     ),
@@ -272,16 +266,28 @@ class _DemoAccount extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      email,
-                      textDirection: TextDirection.ltr,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.ink,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.canvas,
+                        border: Border.all(color: AppColors.line),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        email,
+                        textDirection: TextDirection.ltr,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       detail,
                       style: const TextStyle(

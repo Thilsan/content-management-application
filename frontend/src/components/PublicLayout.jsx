@@ -15,7 +15,7 @@ function branchPages(item) {
 function Chevron({ open }) {
   return (
     <svg
-      className={`size-3 text-muted transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
+      className={`size-3 text-white/50 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
       viewBox="0 0 12 12"
       fill="none"
       stroke="currentColor"
@@ -101,8 +101,8 @@ function NavItem({ item, open, onOpen, onClose, onToggle }) {
         onClick={onClose}
         className={({ isActive }) =>
           isActive
-            ? `${TAB} bg-neutral-100 text-black`
-            : `${TAB} text-ink-soft hover:bg-wash hover:text-ink`
+            ? `${TAB} bg-white/15 text-white`
+            : `${TAB} text-white/70 hover:bg-white/10 hover:text-white`
         }
       >
         {item.title}
@@ -170,7 +170,7 @@ function NavItem({ item, open, onOpen, onClose, onToggle }) {
         ref={buttonRef}
         type="button"
         className={`${TAB} border-0 bg-transparent shadow-none ${
-          open ? 'bg-wash text-ink' : 'text-ink-soft hover:bg-wash hover:text-ink'
+          open ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
         }`}
         aria-expanded={open}
         aria-haspopup="menu"
@@ -178,7 +178,7 @@ function NavItem({ item, open, onOpen, onClose, onToggle }) {
         onKeyDown={handleButtonKey}
       >
         {item.title}
-        <span className="text-[0.72rem] font-normal text-muted">{pages.length}</span>
+        <span className="text-[0.72rem] font-normal text-white/50">{pages.length}</span>
         <Chevron open={open} />
       </button>
 
@@ -209,7 +209,7 @@ function LanguageSwitch() {
   const { locale, setLocale } = useLocale()
 
   return (
-    <div className="flex items-center gap-0.5 rounded-md border border-line p-0.5">
+    <div className="flex items-center gap-0.5 rounded-md border border-white/20 p-0.5">
       {Object.entries(LOCALES).map(([code, meta]) => (
         <button
           key={code}
@@ -219,8 +219,8 @@ function LanguageSwitch() {
           lang={code}
           className={
             code === locale
-              ? 'rounded px-2 py-0.5 text-[0.78rem] font-semibold bg-black text-white shadow-none'
-              : 'rounded px-2 py-0.5 text-[0.78rem] font-medium text-ink-soft hover:bg-wash hover:text-ink'
+              ? 'rounded px-2 py-0.5 text-[0.78rem] font-semibold bg-white text-black shadow-none'
+              : 'rounded px-2 py-0.5 text-[0.78rem] font-medium text-white/70 hover:bg-white/10 hover:text-white'
           }
         >
           {meta.short}
@@ -271,13 +271,13 @@ export default function PublicLayout() {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-line bg-surface/85 backdrop-blur-md backdrop-saturate-150">
+      <header className="sticky top-0 z-20 bg-black">
         <div className="mx-auto flex max-w-260 flex-wrap items-center gap-x-5 gap-y-1 px-6 py-2.5">
           <Link
             to="/"
-            className="flex items-center gap-2 text-[0.95rem] font-semibold tracking-tight whitespace-nowrap text-ink hover:text-ink"
+            className="flex items-center gap-2 text-[0.95rem] font-semibold tracking-tight whitespace-nowrap text-white hover:text-white"
           >
-            <span className="grid size-6 place-items-center rounded-[7px] bg-black text-[0.72rem] font-bold text-white">
+            <span className="grid size-6 place-items-center rounded-[7px] bg-white text-[0.72rem] font-bold text-black">
               CM
             </span>
             Content
@@ -298,7 +298,7 @@ export default function PublicLayout() {
 
           <div className="ms-auto flex items-center gap-3">
             <LanguageSwitch />
-            <Link to="/admin" className="text-[0.88rem] font-medium text-ink-soft hover:text-ink">
+            <Link to="/admin" className="text-[0.88rem] font-medium text-white/70 hover:text-white">
               {t.backOffice}
             </Link>
           </div>

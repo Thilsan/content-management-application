@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 /// The same palette the React app uses, so the two clients look like one
 /// product rather than two takes on it.
 class AppColors {
-  static const ink = Color(0xFF101720);
-  static const inkSoft = Color(0xFF55606D);
-  static const muted = Color(0xFF8B95A2);
+  static const ink = Color(0xFF000000);
+  static const inkSoft = Color(0xFF525252);
+  static const muted = Color(0xFFA3A3A3);
 
-  static const line = Color(0xFFE7EAEF);
+  static const line = Color(0xFFE5E5E5);
+  static const lineStrong = Color(0xFFD4D4D4);
   static const surface = Color(0xFFFFFFFF);
-  static const canvas = Color(0xFFF7F8FA);
+  static const canvas = Color(0xFFFAFAFA);
+
+  static const danger = Color(0xFFC0392F);
+  static const dangerWash = Color(0xFFFDF2F1);
 
   static const accent = Color(0xFF2F6FED);
   static const accentStrong = Color(0xFF1E4FBD);
@@ -22,9 +26,16 @@ class AppColors {
 }
 
 ThemeData buildAppTheme() {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: AppColors.accent,
-  ).copyWith(surface: AppColors.canvas, onSurface: AppColors.ink);
+  const scheme = ColorScheme.light(
+    primary: AppColors.accent,
+    onPrimary: Colors.white,
+    secondary: AppColors.accent,
+    onSecondary: Colors.white,
+    surface: AppColors.canvas,
+    onSurface: AppColors.ink,
+    error: AppColors.danger,
+    onError: Colors.white,
+  );
 
   return ThemeData(
     useMaterial3: true,
@@ -59,7 +70,7 @@ ThemeData buildAppTheme() {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Color(0xFFD9DEE6)),
+        borderSide: const BorderSide(color: AppColors.lineStrong),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -69,7 +80,7 @@ ThemeData buildAppTheme() {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.ink,
         foregroundColor: Colors.white,
         minimumSize: const Size.fromHeight(50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

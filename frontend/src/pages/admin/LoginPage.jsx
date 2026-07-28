@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/AuthContext.jsx'
 import FieldError from '../../components/FieldError.jsx'
 
@@ -40,24 +40,40 @@ export default function LoginPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Brand side. Hidden below lg so the form gets the full screen on a phone. */}
       <div className="hidden flex-col justify-between bg-black p-12 text-white lg:flex">
-        <div className="flex items-center gap-2.5 text-sm font-semibold tracking-tight">
-          <span className="grid size-7 place-items-center rounded-lg bg-white text-[0.75rem] font-bold text-black">
-            CM
-          </span>
-          Content
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 text-sm font-semibold tracking-tight">
+            <span className="grid size-7 place-items-center rounded-lg bg-white text-[0.75rem] font-bold text-black">
+              CM
+            </span>
+            Content
+          </div>
+
+          <Link
+            to="/"
+            className="flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-1.5 text-[0.8rem] font-medium text-white/70 transition-colors hover:border-white/30 hover:text-white"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="size-3.5"
+            >
+              <path d="M3 9.5 12 3l9 6.5" />
+              <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+            </svg>
+            Visit website
+          </Link>
         </div>
 
         <div className="max-w-sm">
           <p className="text-3xl leading-tight font-semibold tracking-tight text-balance">
-            Pages, menus and permissions, all in one place.
-          </p>
-          <p className="mt-4 text-sm leading-relaxed text-white/60">
-            Every action here is enforced by the same privilege the API checks. What a role can do
-            is a row in a table, not a line of code.
+            Welcome to admin dashboard
           </p>
         </div>
-
-        <p className="text-xs text-white/40">Content management system</p>
       </div>
 
       {/* Form side. min-w-0 matters here: a grid item won't shrink below its
@@ -65,8 +81,30 @@ export default function LoginPage() {
           narrow phone as a result. */}
       <div className="flex min-w-0 items-center justify-center bg-white p-6">
         <div className="w-full min-w-0 max-w-sm">
-          <div className="mb-8 grid size-9 place-items-center rounded-lg bg-black text-[0.85rem] font-bold text-white lg:hidden">
-            CM
+          <div className="mb-8 flex items-center justify-between lg:hidden">
+            <div className="grid size-9 place-items-center rounded-lg bg-black text-[0.85rem] font-bold text-white">
+              CM
+            </div>
+
+            <Link
+              to="/"
+              className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-[0.8rem] font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-black"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-3.5"
+              >
+                <path d="M3 9.5 12 3l9 6.5" />
+                <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+              </svg>
+              Visit website
+            </Link>
           </div>
 
           <h1 className="text-2xl font-semibold tracking-tight text-black">Sign in</h1>

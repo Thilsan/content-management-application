@@ -20,9 +20,9 @@
   /* A shade deeper than the canvas so the admin rail reads as its own panel. */
   --color-sidebar: #edf0f5;
 
-  --color-accent: #2f6fed;
-  --color-accent-strong: #1e4fbd;
-  --color-accent-wash: #eff4fe;
+  --color-accent: #000000;
+  --color-accent-strong: #262626;
+  --color-accent-wash: #f4f4f5;
 
   --color-danger: #c0392f;
   --color-danger-wash: #fdf2f1;
@@ -188,7 +188,7 @@
   }
 
   .tag-scheduled {
-    @apply border-[#c6d7f8] bg-accent-wash text-accent-strong;
+    @apply border-line-strong bg-accent-wash text-accent-strong;
   }
 
   .tag-code {

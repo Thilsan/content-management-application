@@ -38,9 +38,8 @@ const STRINGS = {
     loading: 'Loading…',
     onlyInEnglish: 'This page has not been translated yet, so it is shown in English.',
     summary: (pages, sections, locale) =>
-      `${pages} ${pages === 1 ? STRINGS[locale].page : STRINGS[locale].pages} across ` +
-      `${sections} ${sections === 1 ? STRINGS[locale].section : STRINGS[locale].sections}, ` +
-      'in the order the menu sets.',
+      `${pages} ${pages === 1 ? STRINGS[locale].page : STRINGS[locale].pages}, grouped under ` +
+      `${sections} ${sections === 1 ? STRINGS[locale].section : STRINGS[locale].sections}.`,
     matches: (count, term) => `${count} ${count === 1 ? 'match' : 'matches'} for “${term}”`,
   },
   ar: {
@@ -70,7 +69,7 @@ const STRINGS = {
     loading: 'جارٍ التحميل…',
     onlyInEnglish: 'لم تُترجم هذه الصفحة بعد، لذا تُعرض بالإنجليزية.',
     summary: (pages, sections) =>
-      `${pages} ${pages === 1 ? 'صفحة' : 'صفحات'} في ${sections} ${sections === 1 ? 'قسم' : 'أقسام'}، بترتيب القائمة.`,
+      `${pages} ${pages === 1 ? 'صفحة' : 'صفحات'}، ضمن ${sections} ${sections === 1 ? 'قسم' : 'أقسام'}.`,
     matches: (count, term) => `${count} ${count === 1 ? 'نتيجة' : 'نتائج'} لـ «${term}»`,
   },
 }
