@@ -23,27 +23,6 @@ docker/      nginx + php-fpm config
 You can run this with Docker or without it. I used Docker for the final check but did most of
 the actual development running things locally, so both should work.
 
-### Docker
-
-```bash
-git clone <repo-url> laravel-cms
-cd laravel-cms
-docker compose up -d --build
-```
-
-First run takes a bit, it installs composer deps, migrates, seeds and builds the swagger docs.
-Tail the logs if you want to watch it happen (`docker compose logs -f app`). Once it's up:
-
-- Site: http://localhost:5173
-- Admin: http://localhost:5173/admin
-- API: http://localhost:8000/api
-- Swagger: http://localhost:8000/api/documentation
-
-Note that http://localhost:8000 by itself just redirects to swagger. There's no Blade view or
-anything there, the whole UI is the React app.
-
-If you want to reseed from scratch: `docker compose down -v && rm -f backend/storage/.seeded`
-
 ### Without Docker
 
 You need PHP 8.2+ with the usual extensions (pdo_mysql, mbstring, gd, intl, zip), Composer,
@@ -74,6 +53,27 @@ npm run dev
 
 Don't skip `php artisan storage:link`. Cover images will 404 without it even though the upload
 itself works fine (learned that one the hard way while testing).
+
+### Docker
+
+```bash
+git clone <repo-url> laravel-cms
+cd laravel-cms
+docker compose up -d --build
+```
+
+First run takes a bit, it installs composer deps, migrates, seeds and builds the swagger docs.
+Tail the logs if you want to watch it happen (`docker compose logs -f app`). Once it's up:
+
+- Site: http://localhost:5173
+- Admin: http://localhost:5173/admin
+- API: http://localhost:8000/api
+- Swagger: http://localhost:8000/api/documentation
+
+Note that http://localhost:8000 by itself just redirects to swagger. There's no Blade view or
+anything there, the whole UI is the React app.
+
+If you want to reseed from scratch: `docker compose down -v && rm -f backend/storage/.seeded`
 
 ## Logins
 
