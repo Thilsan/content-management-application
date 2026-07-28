@@ -39,7 +39,7 @@ export default function LoginPage() {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Brand side. Hidden below lg so the form gets the full screen on a phone. */}
-      <div className="relative hidden flex-col justify-between overflow-hidden bg-black p-12 text-white lg:flex">
+      <div className="hidden flex-col justify-between bg-black p-12 text-white lg:flex">
         <div className="flex items-center gap-2.5 text-sm font-semibold tracking-tight">
           <span className="grid size-7 place-items-center rounded-lg bg-white text-[0.75rem] font-bold text-black">
             CM
@@ -58,17 +58,6 @@ export default function LoginPage() {
         </div>
 
         <p className="text-xs text-white/40">Content management system</p>
-
-        {/* A quiet grid, purely decorative, so the panel is not just a flat block. */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
-          }}
-          aria-hidden="true"
-        />
       </div>
 
       {/* Form side. min-w-0 matters here: a grid item won't shrink below its
