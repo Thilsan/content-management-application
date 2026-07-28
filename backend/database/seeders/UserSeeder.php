@@ -14,8 +14,8 @@ class UserSeeder extends Seeder
      * @var list<array{name: string, email: string, role: string}>
      */
     private array $accounts = [
-        ['name' => 'Site Administrator', 'email' => 'admin@cms.test', 'role' => 'admin'],
-        ['name' => 'Content Moderator', 'email' => 'moderator@cms.test', 'role' => 'moderator'],
+        ['name' => 'Site Administrator', 'email' => 'admin@cms.com', 'role' => 'admin'],
+        ['name' => 'Content Moderator', 'email' => 'moderator@cms.com', 'role' => 'moderator'],
     ];
 
     public function run(): void
@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
         foreach ($this->accounts as $account) {
             $user = User::updateOrCreate(
                 ['email' => $account['email']],
-                ['name' => $account['name'], 'password' => 'password'],
+                ['name' => $account['name'], 'password' => '12345'],
             );
 
             $user->roles()->sync(

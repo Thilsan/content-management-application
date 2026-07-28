@@ -77,10 +77,10 @@ itself works fine (learned that one the hard way while testing).
 
 ## Logins
 
-Both seeded accounts use `password` as the password.
+Both seeded accounts use `12345` as the password.
 
-- `admin@cms.test`, has every privilege
-- `moderator@cms.test`, can list/add/edit pages and view the menu, nothing else
+- `admin@cms.com`, has every privilege
+- `moderator@cms.com`, can list/add/edit pages and view the menu, nothing else
 
 Easiest way to see the privilege system actually doing something is to log in as the moderator.
 Trash, Users, Roles and Privileges disappear from the nav, and there's no delete button on

@@ -91,11 +91,11 @@ export default function LoginPage() {
 
           <div className="mt-5 rounded-panel border border-line bg-wash px-3.5 py-3 text-[0.82rem] leading-7 text-ink-soft">
             <span className="eyebrow mb-1 block">Seeded accounts</span>
-            <code className="code">admin@cms.test</code> — full access
+            <code className="code">admin@cms.com</code> — full access
             <br />
-            <code className="code">moderator@cms.test</code> — pages only
+            <code className="code">moderator@cms.com</code> — pages only
             <br />
-            Password for both: <code className="code">password</code>
+            Password for both: <code className="code">12345</code>
           </div>
         </div>
       </div>

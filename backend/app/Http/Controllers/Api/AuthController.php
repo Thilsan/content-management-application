@@ -25,8 +25,8 @@ class AuthController extends Controller
             content: new OA\JsonContent(
                 required: ['email', 'password'],
                 properties: [
-                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@cms.test'),
-                    new OA\Property(property: 'password', type: 'string', format: 'password', example: 'password'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@cms.com'),
+                    new OA\Property(property: 'password', type: 'string', format: 'password', example: '12345'),
                     new OA\Property(
                         property: 'device_name',
                         description: 'Names the issued token. Defaults to "web".',

@@ -16,7 +16,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'name', type: 'string', example: 'Site Administrator'),
-        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@cms.test'),
+        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'admin@cms.com'),
         new OA\Property(
             property: 'roles',
             type: 'array',

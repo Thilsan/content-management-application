@@ -14,7 +14,7 @@ class ContentSeeder extends Seeder
     {
         $this->createMenus($this->menuTree(), null);
 
-        $author = User::where('email', 'admin@cms.test')->firstOrFail();
+        $author = User::where('email', 'admin@cms.com')->firstOrFail();
 
         foreach ($this->pages() as $data) {
             $menu = Menu::where('slug', $data['menu'])->firstOrFail();

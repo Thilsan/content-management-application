@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _use(String email) {
     setState(() {
       _email.text = email;
-      _password.text = 'password';
+      _password.text = '12345';
       _emailError = null;
     });
   }
@@ -213,15 +213,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   Eyebrow(t.seededAccounts),
                   const SizedBox(height: 10),
                   _DemoAccount(
-                    email: 'admin@cms.test',
+                    email: 'admin@cms.com',
                     detail: t.adminDetail,
-                    onTap: () => _use('admin@cms.test'),
+                    onTap: () => _use('admin@cms.com'),
                   ),
                   const SizedBox(height: 8),
                   _DemoAccount(
-                    email: 'moderator@cms.test',
+                    email: 'moderator@cms.com',
                     detail: t.moderatorDetail,
-                    onTap: () => _use('moderator@cms.test'),
+                    onTap: () => _use('moderator@cms.com'),
                   ),
                   const SizedBox(height: 12),
                   Text(
