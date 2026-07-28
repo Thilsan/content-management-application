@@ -1,107 +1,102 @@
-# Content management application
+# Content Management Application
 
-A small CMS: a Laravel API with users, roles and privileges, dynamic pages grouped under a
-sortable and nestable menu, and a React front end that reads it all. Every write endpoint is
-guarded by a privilege that lives in the database, documented with OpenAPI and covered by tests.
+Laravel Developer take-home assignment. A CMS backend (users, roles, privileges, pages, a
+sortable/nestable menu) with a React frontend and a Flutter mobile client, all talking to the
+same API.
 
-- **Back end** — PHP 8.2+, Laravel 12, MySQL, Laravel Sanctum, l5-swagger
-- **Front end** — React 19, Vite, React Router, Tailwind CSS 4, CKEditor 5, dnd-kit
-- **Tests** — Pest, 95 feature and unit tests
+Stack:
+- **Backend:** PHP 8.2+, Laravel 12, MySQL, Sanctum, l5-swagger
+- **Frontend:** React 19, Vite, Tailwind 4, CKEditor 5
+- **Mobile:** Flutter (read-only client)
+- **Tests:** Pest, 95 tests on the backend, 16 on the mobile app
+
+Folder layout:
 
 ```
 backend/     Laravel API
-frontend/    React app (public site and back office)
-mobile/      Flutter client (optional extra)
-docker/      nginx and PHP-FPM images
+frontend/    React app (public site + admin)
+mobile/      Flutter app (bonus)
+docker/      nginx + php-fpm config
 ```
 
-## Running it
+## Setup
 
-Two paths. Docker needs nothing installed but Docker; the local path is faster if you already
-have PHP and Node.
+You can run this with Docker or without it. I used Docker for the final check but did most of
+the actual development running things locally, so both should work.
 
-### With Docker
+### Docker
 
 ```bash
-git clone <repository-url> laravel-cms
+git clone <repo-url> laravel-cms
 cd laravel-cms
 docker compose up -d --build
 ```
 
-The first boot installs dependencies, runs the migrations, seeds the demo content and generates
-the Swagger document. Watch it finish with `docker compose logs -f app`, then open:
+First run takes a bit, it installs composer deps, migrates, seeds and builds the swagger docs.
+Tail the logs if you want to watch it happen (`docker compose logs -f app`). Once it's up:
 
-| What | Where |
-| --- | --- |
-| Public site | <http://localhost:5173> |
-| Back office | <http://localhost:5173/admin> |
-| API | <http://localhost:8000/api> |
-| Swagger UI | <http://localhost:8000/api/documentation> |
+- Site: http://localhost:5173
+- Admin: http://localhost:5173/admin
+- API: http://localhost:8000/api
+- Swagger: http://localhost:8000/api/documentation
 
-The user interface is entirely the React app on port 5173. The Laravel side serves
-JSON and the Swagger page only, so <http://localhost:8000> redirects to the documentation
-rather than rendering anything of its own.
+Note that http://localhost:8000 by itself just redirects to swagger. There's no Blade view or
+anything there, the whole UI is the React app.
 
-Seeding runs once. To start over: `docker compose down -v && rm -f backend/storage/.seeded`.
+If you want to reseed from scratch: `docker compose down -v && rm -f backend/storage/.seeded`
 
 ### Without Docker
 
-Needs PHP 8.2+ (with `pdo_mysql`, `mbstring`, `gd`, `intl`, `zip`), Composer, Node 20+ and a
-MySQL or PostgreSQL server.
+You need PHP 8.2+ with the usual extensions (pdo_mysql, mbstring, gd, intl, zip), Composer,
+Node 20+, and a MySQL/Postgres server running somewhere.
 
 ```bash
-# API
 cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
 mysql -uroot -e "CREATE DATABASE cms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-# edit .env if your credentials are not root with no password
+# change DB_* in .env if root/no-password isn't your setup
 php artisan migrate --seed
-php artisan storage:link          # so uploaded cover images are served
+php artisan storage:link
 php artisan l5-swagger:generate
-php artisan serve                 # http://localhost:8000
+php artisan serve
 ```
+
+Then in another terminal:
 
 ```bash
-# Front end, in a second terminal
 cd frontend
 npm install
-cp .env.example .env              # points at http://localhost:8000
-npm run dev                       # http://localhost:5173
+cp .env.example .env
+npm run dev
 ```
 
-`php artisan storage:link` matters: without it cover images 404 even though the upload
-succeeded.
+Don't skip `php artisan storage:link`. Cover images will 404 without it even though the upload
+itself works fine (learned that one the hard way while testing).
 
-## Seeded logins
+## Logins
 
-Both accounts use the password `password`.
+Both seeded accounts use `password` as the password.
 
-| Email | Role | May do |
-| --- | --- | --- |
-| `admin@cms.test` | Administrator | Everything: all 22 privileges |
-| `moderator@cms.test` | Moderator | List, add and edit pages; read the menu. Nothing else |
+- `admin@cms.test`, has every privilege
+- `moderator@cms.test`, can list/add/edit pages and view the menu, nothing else
 
-Signing in as the moderator is the quickest way to see the rules working: the Trash, Users,
-Roles and Privileges sections disappear from the navigation, and the Delete button disappears
-from the pages list. The API refuses those calls with a 403 regardless of what the interface
-offers.
+Easiest way to see the privilege system actually doing something is to log in as the moderator.
+Trash, Users, Roles and Privileges disappear from the nav, and there's no delete button on
+pages. And it's not just hidden in the UI, the API returns 403 on those routes no matter what
+the frontend shows.
 
 ## Swagger
 
-The OpenAPI document is generated from PHP 8 attributes on the controllers and API resources, so
-it is written next to the code that produces each response rather than in a separate file.
+http://localhost:8000/api/documentation has all 33 endpoints, documented straight from PHP
+attributes on the controllers and resources instead of a separate yaml file, so it's less likely
+to go stale. Regenerate with `php artisan l5-swagger:generate`, or leave
+`L5_SWAGGER_GENERATE_ALWAYS=true` in your .env and it rebuilds on every request while you're
+developing.
 
-- UI: <http://localhost:8000/api/documentation>
-- JSON: <http://localhost:8000/docs>
-- Regenerate: `php artisan l5-swagger:generate`
-
-`L5_SWAGGER_GENERATE_ALWAYS=true` in `.env.example` regenerates on every request in development,
-which keeps the docs honest while the endpoints move. All 33 operations are documented.
-
-To try a guarded endpoint from the UI: call `POST /api/auth/login`, copy the `token` out of the
-response, click **Authorize**, and paste it in.
+To test an authenticated route from the Swagger UI: hit `POST /api/auth/login`, copy the token
+from the response, click Authorize, paste it in.
 
 ## Tests
 
@@ -110,36 +105,30 @@ cd backend
 php artisan test
 ```
 
-Tests run against SQLite in memory, so no database setup is needed and nothing touches your
-development data.
+Runs against an in-memory SQLite db so it won't touch anything on your machine. Currently:
 
 ```
-Tests: 95 passed (308 assertions)
+Tests:    95 passed (308 assertions)
 ```
 
-What they cover:
+Quick rundown of what's covered:
 
-| File | Subject |
-| --- | --- |
-| `AuthTest` | Token issue, bad credentials, 401 without a token, logout revoking a token, login throttling |
-| `RolePrivilegeTest` | What a moderator may and may not do, including that a moderator cannot delete a page |
-| `PageManagementTest` | Pagination, search, filters, cover uploads, the audit trail, trash and restore |
-| `MenuTest` | Nested tree, reordering, circular-order rejection, deleting a branch that still holds pages |
-| `PublicContentTest` | Drafts and future dated pages hidden, a scheduled page appearing once promoted |
-| `ScheduledPublishingTest` | The Artisan command promoting, withdrawing, and leaving the audit trail alone |
-| `LocalisationTest` | Arabic content, the per page fallback, translated menus and Arabic search |
-| `UserManagementTest` | User CRUD, password hashing, and refusing to delete your own account |
-| `RoleManagementTest` | Role and privilege CRUD, and re-granting privileges changing what a role may do |
-| `HelperTest`, `SlugHelperTest` | The custom helpers |
+- `AuthTest`: login/logout, bad credentials, throttling, 401s
+- `RolePrivilegeTest`: what a moderator can and can't do (the important one re: the brief)
+- `PageManagementTest`: pagination, search, filters, cover uploads, audit fields, trash/restore
+- `MenuTest`: nesting, reorder, rejecting a circular reference
+- `PublicContentTest` and `ScheduledPublishingTest`: drafts and future-dated pages staying hidden
+- `LocalisationTest`: the Arabic fallback logic
+- `UserManagementTest` and `RoleManagementTest`: CRUD, and permission changes taking effect right away
+- `HelperTest`, `SlugHelperTest`: the custom helper functions
 
-## How permissions work
+## How the permission system works
 
-Privileges are rows, not role names in code. A privilege such as `pages.delete` is stored in the
-`privileges` table, granted to roles through `privilege_role`, and roles are attached to users
-through `role_user`.
-
-Every privilege name doubles as a gate ability. One `Gate::before` hook in
-`app/Providers/AppServiceProvider.php` resolves any ability against the user's privileges:
+This was probably the part of the brief I paid the most attention to, the line about privileges
+being data and not hard-coded role names. So there's a `privileges` table, roles pull from it
+through `privilege_role`, and users get roles through `role_user`. A privilege name like
+`pages.delete` is the gate ability itself. There's a single `Gate::before` in
+`AppServiceProvider` that checks it:
 
 ```php
 Gate::before(function (User $user, string $ability) {
@@ -147,149 +136,128 @@ Gate::before(function (User $user, string $ability) {
 });
 ```
 
-Routes then guard themselves with Laravel's own `can:` middleware, so `routes/api.php` reads as
-a list of which privilege each endpoint needs:
+Routes just declare what they need:
 
 ```php
-Route::get('/', [PageController::class, 'index'])->middleware('can:pages.view');
 Route::delete('/', [PageController::class, 'destroy'])->middleware('can:pages.delete');
 ```
 
-Nothing anywhere checks for the string `admin` or `moderator`. Changing what a role may do is a
-row in a pivot table, which is why `RoleManagementTest` can grant `pages.delete` to a role
-mid-test and watch the same user go from 403 to 200.
-
-Privilege names read as `group.action` and that shape is enforced when one is created, so a new
-privilege is immediately checkable: add `reports.export`, grant it to a role, and
-`can:reports.export` works with no deploy.
-
-Form requests only validate. Authorization lives in the route definitions so there is one place
-to read it.
+No `if ($user->role === 'admin')` anywhere. You can grant or revoke a privilege on a role and it
+takes effect right away, no deploy needed. There's a test that grants `pages.delete` to a role
+mid-test and checks the same user goes from 403 to 200 on the next call.
 
 ## Scheduled publishing
 
-A page is visible to readers when it is published **and** its publish date has passed. Rather
-than evaluating that date on every request, the answer is stored on the row in `is_live`, and a
-scheduled Artisan command owns the transition:
+Pages have a `published_at` date, and a page only shows on the public site once that date has
+passed. Instead of checking the date on every read, there's an `is_live` boolean on the row and
+an artisan command that flips it:
 
 ```bash
 php artisan pages:publish-due
 ```
 
-It promotes anything now due, and withdraws anything pulled back to draft or pushed to a later
-date. Every public endpoint then filters on a single indexed boolean through
-`Page::scopeVisible()`:
-
-```php
-$query->where('is_live', true);
-```
-
-The command is registered in `routes/console.php` to run every minute. To have it actually run:
+It promotes anything due, and also un-publishes anything that got pulled back to draft or
+rescheduled later (wanted the reverse case handled too, not just the happy path). Registered in
+`routes/console.php` to run every minute:
 
 ```bash
-php artisan schedule:work    # local, keeps running in the foreground
+php artisan schedule:work   # locally
 ```
 
 ```
-* * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1    # a server
+* * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1   # on a real server
 ```
 
-Under Docker the `scheduler` service does this for you, so nothing extra is needed.
+The Docker `scheduler` container just runs `schedule:work` for you, so nothing to configure there.
 
-Saving a page still settles the flag immediately, so publishing something with no date is live
-at once rather than waiting for the next tick. Only *dated* pages wait for the scheduler.
-
-Leaving the publish date empty means "live as soon as it is published". A date in the future
-means the page sits in the back end marked **Scheduled** and 404s on the public site until the
-command promotes it.
-
-The seeded content includes both cases so the behaviour is visible immediately:
-
-- **Internship Programme** — a draft under Careers, listed in the back office, absent from the site
-- **Autumn Product Launch** — published but dated a week out, marked Scheduled, absent from the site
+One wrinkle: saving a page with no publish date goes live immediately, no reason to make it wait
+for the next minute-tick, but a page with a future date does wait on the scheduler. Both cases
+are in the seed data so you can see them. "Internship Programme" is a plain draft, and "Autumn
+Product Launch" is published but dated a week out, so it shows as Scheduled in the admin and
+404s on the public site until the command runs and the date has passed.
 
 ## Menu
 
-The menu is a tree of any depth ordered by `position`. `GET /api/menus` builds it from a single
-query and hydrates the `children` relation in PHP, so nesting costs one query rather than one
-per level.
+Nested to any depth, ordered by `position`. `GET /api/menus` fetches everything in one query and
+builds the tree in PHP rather than N+1'ing per level.
 
-Reordering posts the whole tree to `POST /api/menus/reorder`, with every node's new parent and
-position. The payload is rejected if it describes a loop, and a menu item cannot be moved inside
-one of its own children. Switching a parent off hides its entire branch from the public site.
+Reordering sends the whole tree at once (`POST /api/menus/reorder`) with each node's new parent
++ position. Rejects anything that would create a loop, and you can't nest an item under its own
+child. Turning off a parent hides the whole branch from the public site, children included.
 
-Dragging a heading in the back office carries its children with it, and the arrows indent or
-outdent. Nothing changes for readers until **Save order** is pressed.
+In the admin, dragging a row takes its children with it, and there are indent/outdent buttons.
+Nothing actually changes until you hit Save.
 
-## Audit and trash
+## Audit trail + trash
 
-Pages record `created_by` and `updated_by`, set from the authenticated user in the model's
-`booted()` hook, and both are shown in the back office. Deleting is a soft delete: the row and
-its cover image are kept, the page leaves the public site, and an administrator can restore it
-from Trash exactly as it was. Only `pages.restore`, which the moderator does not hold, reaches
-the trash. Deleting for good also removes the cover file from disk.
+Pages track `created_by` and `updated_by`, set automatically from the logged-in user (see the
+model's `booted()`). Delete is soft: the row and cover image stick around, the page comes off
+the public site, and an admin can restore it later from Trash. Moderators don't have
+`pages.restore` so they can't reach the trash at all, force-delete included. Force-deleting also
+cleans up the cover file from disk.
 
-## Notes on a few decisions
+## A few implementation notes
 
-- **Token auth, not cookies.** Sanctum personal access tokens keep the API stateless and mean
-  the same endpoints would serve a mobile client without change.
-- **Slugs are stable.** A slug is generated from the title on create and then left alone unless a
-  new one is sent explicitly, so renaming a page does not break its public URL. The generator
-  counts soft deleted rows, so a slug is never quietly reused.
-- **Cover uploads use POST with `_method=PUT`.** PHP only populates uploaded files on POST
-  requests, so an update sends multipart as POST with a spoofed method. Both are accepted.
-- **An empty file input cannot blank a cover.** Clearing an image is an explicit `remove_cover`
-  flag rather than a side effect of submitting the form without a file.
-- **Deleting a menu item is refused while pages are filed under it**, including pages in the
-  trash, rather than letting the foreign key fail.
-- **Composer resolves against PHP 8.2.** `config.platform.php` is pinned in `composer.json`, so
-  the lock file installs on any PHP the brief allows. Without it, resolving on a newer PHP pulls
-  in Symfony 8, which needs 8.4.1, and the project quietly stops matching its own requirement.
-- **CORS is limited to `FRONTEND_URL`** rather than left open.
-- **Login is rate limited** to six attempts a minute.
-- **Page bodies are rendered as HTML** on the public site. The markup comes from CKEditor and an
-  authenticated editor, which is the trust boundary a CMS accepts by design.
+Things that might not be obvious from just reading the code:
 
-## Arabic and right to left
+- Token auth (Sanctum), not sessions. Made it trivial to reuse the same API for the mobile app.
+- Slugs don't change on rename. Generated once from the title and kept afterward unless you
+  explicitly set a new one, otherwise editing a title would break the page's public URL. The
+  slug generator also checks soft-deleted rows so a slug never gets silently reused.
+- Uploading a new cover image on an update goes through as `POST` with a `_method=PUT` field,
+  because PHP doesn't populate `$_FILES` on a real PUT request. Both are accepted server-side.
+- Clearing a cover image is an explicit `remove_cover` flag. An update request with no file just
+  leaves the existing cover alone, it doesn't accidentally wipe it.
+- You can't delete a menu item that still has pages under it, including trashed ones.
+- `composer.json` pins `config.platform.php` to 8.2.0. Without this, composer resolves against
+  whatever PHP you're running locally, and if that happens to be 8.4 it'll install Symfony 8,
+  which actually needs PHP 8.4.1+. So the lockfile would end up requiring a newer PHP than the
+  project claims to support. I only caught this because the Docker container (PHP 8.3) refused
+  to boot.
+- CORS is locked to `FRONTEND_URL`, not wide open.
+- Login is rate-limited, 6 attempts a minute.
+- Page bodies render as raw HTML on the site. It's CKEditor output from an authenticated editor,
+  so that's an accepted trust boundary for a CMS, not an oversight.
 
-Pages and menu items carry an optional Arabic title and body next to the English ones. With two
-languages that is one row per page rather than a translations table, so nothing needs joining to
-render a page.
+## Arabic / RTL (bonus)
 
-Public endpoints take `?lang=ar`:
+Pages and menu items can have an Arabic title/body alongside the English ones (just extra
+columns, didn't bother with a separate translations table since there are only two languages).
+
+Public API takes a `?lang=ar` param:
 
 ```bash
 curl 'http://localhost:8000/api/public/pages/who-we-are?lang=ar'
 ```
 
-The response is already resolved — one language, no field picking on the client:
+and gives you back one already-resolved language, so the frontend isn't picking between fields:
 
 ```json
 { "title": "من نحن", "locale": "ar", "direction": "rtl", "is_translated": true }
 ```
 
-**The fallback is per page, and all or nothing.** A page with no Arabic is served in English with
-`is_translated: false`, and the site says so rather than showing a blank title. A page translated
-only halfway is served wholly in English too — an Arabic heading above an English body is worse
-than either language on its own. Four of the eight seeded pages are translated, deliberately, so
-both paths are visible.
+Fallback logic: if a page has no Arabic at all, it serves in English and says
+`is_translated: false`. If it's only partially translated (say just the title), it still falls
+back to English entirely. Showing an Arabic heading over an English body seemed worse than just
+picking one language and being consistent about it. Four of the eight seeded pages have Arabic
+content and the other four don't, so you can see both cases on the site.
 
-On the site, the **EN / عربي** switch in the header sets `dir` and `lang` on the document and
-remembers the choice. Layout flips because the components use logical properties (`ms-`, `ps-`,
-`start-`, `text-end`, `border-s`) rather than left and right, so there is no mirrored stylesheet
-to maintain. The handful of places that cannot flip on their own — the typography plugin's
-blockquote border, list indents, the select arrow, and the Arabic font stack — are grouped under
-`[dir='rtl']` in `index.css`.
+The language switch in the header (EN / عربي) sets `dir` and `lang` on the page and remembers
+your choice. Layout flips because I used logical Tailwind properties (`ms-`, `ps-`, `start-`,
+`border-s`, etc.) instead of left/right everywhere, so there's no separate mirrored stylesheet to
+maintain, just a small `[dir='rtl']` block in index.css for the handful of things that don't flip
+on their own (the typography plugin's blockquote border, the select arrow, that kind of thing).
 
-Two details worth knowing. The article body carries its own `dir`, so an English fallback inside
-an otherwise Arabic page still reads left to right. And in the back office the page form has an
-**English / العربية** switch that puts CKEditor itself into RTL, because telling the editor its
-content language is what moves the caret; styling it from outside would not.
+A couple of details worth mentioning. The article body has its own `dir` attribute, so if a page
+falls back to English inside an otherwise-Arabic session, that one page still reads left to
+right. And in the admin, the page editor has its own EN/Arabic toggle that switches CKEditor
+itself into RTL mode. You have to tell CKEditor the content language directly, styling the
+wrapper div doesn't move the cursor around correctly.
 
-## Mobile client
+## Mobile app (bonus)
 
-A small read-only Flutter app in `mobile/`. It signs in against the same Sanctum endpoints the
-React app uses, browses the pages grouped under the menu, and opens one.
+Read-only Flutter client in `mobile/`. Logs in against the same Sanctum endpoints, lists pages
+under the menu, opens one.
 
 ```bash
 cd mobile
@@ -297,45 +265,37 @@ flutter pub get
 flutter run
 ```
 
-It talks to `http://localhost:8000` by default, which is what an iOS simulator needs. An Android
-emulator reaches the host on a different address:
+Defaults to `http://localhost:8000`, which works for the iOS simulator. Android emulator needs:
 
 ```bash
 flutter run --dart-define=API_URL=http://10.0.2.2:8000
 ```
 
 ```bash
-flutter test      # 16 tests over the API client, parsing and the language rules
+flutter test      # 16 tests
 flutter analyze
 ```
 
-The app is bilingual too, with an **EN / عربي** toggle in the app bar. Flutter mirrors the whole
-tree once it knows the locale, so there is no separate RTL layout to maintain. It reads the
-authenticated endpoints, which return raw `title_ar` and `body_ar` rather than a resolved
-language, so the same all-or-nothing fallback rule is applied on the device — covered by tests so
-the phone and the website cannot drift apart. A page's own body carries its own direction, so an
-English fallback inside an Arabic app still reads left to right.
+It hits the authenticated endpoints, same as the admin panel, not the public ones, so signing in
+actually changes what you can see. A moderator account gets the same 403s here as everywhere
+else, and drafts and scheduled pages show up with a badge just like in the web admin. The token
+gets stored on the device and re-checked against `/api/auth/me` on launch, so if it's been
+revoked you land back on the login screen instead of a blank list.
 
-Worth knowing: it reads the **authenticated** endpoints rather than the public ones, so signing
-in actually means something. Drafts and scheduled pages appear with a badge, exactly as they do
-in the back office, and the same privileges apply — a moderator gets the same 403s here as
-anywhere else. The token is kept on the device and checked against `/api/auth/me` on launch, so
-a revoked token drops you back to the sign in screen instead of an empty list.
+It also has the EN/Arabic toggle, with the same fallback rule as the website. That rule is
+reimplemented in Dart, since the authenticated endpoints return both raw fields rather than one
+resolved value. It's a bit of duplication, but it's covered by tests on both sides so they
+shouldn't drift apart.
 
-The page body is CKEditor HTML, rendered as markup with `flutter_html`.
+Page bodies render through `flutter_html`. One iOS-specific thing worth mentioning:
+`ios/Runner/Info.plist` has an `NSAllowsLocalNetworking` exception in it, otherwise iOS blocks
+the plain http request to a local API. It's scoped narrowly to local network traffic, not
+general cleartext HTTP.
 
-`ios/Runner/Info.plist` carries an `NSAllowsLocalNetworking` exception, without which iOS blocks
-the cleartext request to a local API. That is the narrow form of the exception; it does not
-permit arbitrary HTTP.
+## Bonus items
 
-## Optional extras
+All three from the brief are done:
 
-Of the three bonus items in the brief:
-
-All three are done:
-
-- **Artisan command** — `pages:publish-due`, scheduled every minute, described above.
-- **Mobile app** — Flutter client in `mobile/`, described above.
-- **Arabic / RTL** — bilingual pages with a per page fallback, described above.
-
-Arabic works on the website and in the mobile client.
+- Artisan command driving scheduled publishing (`pages:publish-due`, covered above)
+- Mobile client (`mobile/`, Flutter)
+- Arabic / RTL, working on both the website and the mobile app
