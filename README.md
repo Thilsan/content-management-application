@@ -1,8 +1,7 @@
 # Content Management Application
 
 A content management system with a Laravel API, a React front end, and a Flutter mobile client.
-Users, roles and privileges, dynamic pages under a sortable and nestable menu, and permission
-checks enforced on every endpoint, not just hidden in the UI.
+Users, roles and privileges, dynamic pages under a sortable and nestable menu, and permission.
 
 Stack:
 - **Backend:** PHP 8.2+, Laravel 12, MySQL, Sanctum, l5-swagger
@@ -58,6 +57,7 @@ php artisan key:generate
 mysql -uroot -e "CREATE DATABASE cms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 # change DB_* in .env if root/no-password isn't your setup
 php artisan migrate --seed
+php artisan pages:publish-due   # settles which seeded pages count as live right now
 php artisan storage:link
 php artisan l5-swagger:generate
 php artisan serve
