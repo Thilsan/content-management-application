@@ -114,7 +114,7 @@ Tests:    95 passed (308 assertions)
 Quick rundown of what's covered:
 
 - `AuthTest`: login/logout, bad credentials, throttling, 401s
-- `RolePrivilegeTest`: what a moderator can and can't do (the important one re: the brief)
+- `RolePrivilegeTest`: what a moderator can and can't do, this is the main one for the permission rules
 - `PageManagementTest`: pagination, search, filters, cover uploads, audit fields, trash/restore
 - `MenuTest`: nesting, reorder, rejecting a circular reference
 - `PublicContentTest` and `ScheduledPublishingTest`: drafts and future-dated pages staying hidden
@@ -124,11 +124,10 @@ Quick rundown of what's covered:
 
 ## How the permission system works
 
-This was probably the part of the brief I paid the most attention to, the line about privileges
-being data and not hard-coded role names. So there's a `privileges` table, roles pull from it
-through `privilege_role`, and users get roles through `role_user`. A privilege name like
-`pages.delete` is the gate ability itself. There's a single `Gate::before` in
-`AppServiceProvider` that checks it:
+Permissions are stored as data instead of being hard-coded checks against a role name. There's a
+`privileges` table, roles pull from it through `privilege_role`, and users get roles through
+`role_user`. A privilege name like `pages.delete` is the gate ability itself. There's a single
+`Gate::before` in `AppServiceProvider` that checks it:
 
 ```php
 Gate::before(function (User $user, string $ability) {
@@ -294,7 +293,7 @@ general cleartext HTTP.
 
 ## Bonus items
 
-All three from the brief are done:
+Did all three:
 
 - Artisan command driving scheduled publishing (`pages:publish-due`, covered above)
 - Mobile client (`mobile/`, Flutter)
