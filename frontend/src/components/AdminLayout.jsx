@@ -82,7 +82,7 @@ export default function AdminLayout() {
           <span className="grid size-6 place-items-center rounded-[7px] bg-linear-to-br from-accent to-[#6d4bf0] text-[0.72rem] font-bold text-white">
             CM
           </span>
-          Back office
+          Admin
         </Link>
 
         <nav className="flex gap-1 overflow-x-auto scrollbar-none lg:flex-1 lg:flex-col lg:gap-0.5 lg:overflow-visible [&::-webkit-scrollbar]:hidden">

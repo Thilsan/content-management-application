@@ -69,7 +69,7 @@ class AppStrings {
     couldNotLoad: 'Could not load the pages',
     tryAgain: 'Try again',
     noPages: 'No pages yet',
-    noPagesDetail: 'Pages added in the back office show up here.',
+    noPagesDetail: 'Pages added in the admin panel show up here.',
     noMatches: 'Nothing matches that search',
     tryShorter: 'Try a shorter word.',
     minRead: 'min read',

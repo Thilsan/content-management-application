@@ -13,7 +13,7 @@ const STRINGS = {
     index: 'Index',
     publishedPages: 'Published pages',
     searchPages: 'Search these pages',
-    backOffice: 'Back office',
+    backOffice: 'Admin',
     page: 'page',
     pages: 'pages',
     section: 'section',
